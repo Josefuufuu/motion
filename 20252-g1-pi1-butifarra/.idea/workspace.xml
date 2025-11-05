@@ -1,0 +1,220 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="AutoImportSettings">
+    <option name="autoReloadType" value="SELECTIVE" />
+  </component>
+  <component name="ChangeListManager">
+    <list default="true" id="d678effe-0d0d-45fb-8bea-3b99cc7f718b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/ROLES_SETUP.md" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/butifarra/actividades/management/commands/create_user_profiles.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/App.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Dashboard/TopBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Dashboard/TopBar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Sidebar/RouteSelect.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Sidebar/RouteSelect.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/context/AuthContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/ActivitiesCalendar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/ActivitiesCalendar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/AdminHomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/AdminHomePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/HomeBeneficiary.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/HomeBeneficiary.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/admin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/views.py" afterDir="false" />
+    </list>
+    <option name="SHOW_DIALOG" value="false" />
+    <option name="HIGHLIGHT_CONFLICTS" value="true" />
+    <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
+    <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FlaskConsoleOptions" custom-start-script="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass">
+    <envs>
+      <env key="FLASK_APP" value="app" />
+    </envs>
+    <option name="myCustomStartScript" value="import sys; print('Python %s on %s' % (sys.version, sys.platform)); sys.path.extend([WORKING_DIR_AND_PYTHON_PATHS])&#10;from flask.cli import ScriptInfo, NoAppException&#10;for module in [&quot;main.py&quot;, &quot;wsgi.py&quot;, &quot;app.py&quot;]:&#10;    try: locals().update(ScriptInfo(app_import_path=module, create_app=None).load_app().make_shell_context()); print(&quot;\nFlask App: %s&quot; % app.import_name); break&#10;    except NoAppException: pass" />
+    <option name="myEnvs">
+      <map>
+        <entry key="FLASK_APP" value="app" />
+      </map>
+    </option>
+  </component>
+  <component name="Git.Settings">
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+  </component>
+  <component name="ProjectCodeStyleSettingsMigration">
+    <option name="version" value="2" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;customColor&quot;: &quot;&quot;,
+  &quot;associatedIndex&quot;: 3
+}</component>
+  <component name="ProjectId" id="32oDKJRKV8YWitNepaApLa2CxZ2" />
+  <component name="ProjectViewState">
+    <option name="hideEmptyMiddlePackages" value="true" />
+    <option name="showLibraryContents" value="true" />
+  </component>
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Python tests.Python tests in conftest.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_analitica_reportes.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_api_auth.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_cadi.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_eventos_servicios.py.executor&quot;: &quot;Run&quot;,
+    &quot;Python tests.Python tests in test_web_views.py.executor&quot;: &quot;Run&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;feature/fixDuplicados&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/Users/kevin/Desktop/Estudios/Semestre_6_Icesi/Proyecto_integrador_1/pruebas/20252-g1-pi1-butifarra&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_interpreter_path&quot;: &quot;C:/Users/kevin/AppData/Roaming/JetBrains/PyCharm2025.2/node/versions/24.9.0/node&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.pluginManager&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;stardust.markdown.MarkdownSplitEditorSuppressor:keyList&quot;: []
+  }
+}</component>
+  <component name="RunManager" selected="Python tests.Python tests in test_analitica_reportes.py">
+    <configuration name="Python tests in conftest.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="20252-g1-pi1-butifarra" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/butifarra/actividades/conftest.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test_analitica_reportes.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="20252-g1-pi1-butifarra" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/butifarra/actividades/tests/test_analitica_reportes.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test_cadi.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="20252-g1-pi1-butifarra" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/butifarra/actividades/tests/test_cadi.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test_eventos_servicios.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="20252-g1-pi1-butifarra" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/butifarra/actividades/tests/test_eventos_servicios.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <configuration name="Python tests in test_web_views.py" type="tests" factoryName="Autodetect" temporary="true" nameIsGenerated="true">
+      <module name="20252-g1-pi1-butifarra" />
+      <option name="ENV_FILES" value="" />
+      <option name="INTERPRETER_OPTIONS" value="" />
+      <option name="PARENT_ENVS" value="true" />
+      <option name="SDK_HOME" value="" />
+      <option name="WORKING_DIRECTORY" value="$PROJECT_DIR$" />
+      <option name="IS_MODULE_SDK" value="true" />
+      <option name="ADD_CONTENT_ROOTS" value="true" />
+      <option name="ADD_SOURCE_ROOTS" value="true" />
+      <EXTENSION ID="PythonCoverageRunConfigurationExtension" runner="coverage.py" />
+      <option name="_new_additionalArguments" value="&quot;&quot;" />
+      <option name="_new_target" value="&quot;$PROJECT_DIR$/butifarra/actividades/tests/test_web_views.py&quot;" />
+      <option name="_new_targetType" value="&quot;PATH&quot;" />
+      <method v="2" />
+    </configuration>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Python tests.Python tests in test_analitica_reportes.py" />
+        <item itemvalue="Python tests.Python tests in test_cadi.py" />
+        <item itemvalue="Python tests.Python tests in test_eventos_servicios.py" />
+        <item itemvalue="Python tests.Python tests in conftest.py" />
+        <item itemvalue="Python tests.Python tests in test_web_views.py" />
+      </list>
+    </recent_temporary>
+  </component>
+  <component name="SharedIndexes">
+    <attachedChunks>
+      <set>
+        <option value="bundled-js-predefined-d6986cc7102b-3aa1da707db6-JavaScript-PY-252.27397.106" />
+        <option value="bundled-python-sdk-4e2b1448bda8-9a97661f3031-com.jetbrains.pycharm.pro.sharedIndexes.bundled-PY-252.27397.106" />
+      </set>
+    </attachedChunks>
+  </component>
+  <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
+  <component name="TaskManager">
+    <task active="true" id="Default" summary="Default task">
+      <changelist id="d678effe-0d0d-45fb-8bea-3b99cc7f718b" name="Changes" comment="" />
+      <created>1758077966970</created>
+      <option name="number" value="Default" />
+      <option name="presentableId" value="Default" />
+      <updated>1758077966970</updated>
+      <workItem from="1758077967699" duration="93000" />
+      <workItem from="1758552984263" duration="26000" />
+      <workItem from="1760403646733" duration="480000" />
+      <workItem from="1760404142314" duration="1500000" />
+      <workItem from="1760713519035" duration="7323000" />
+      <workItem from="1760880742711" duration="12655000" />
+      <workItem from="1760901423583" duration="769000" />
+      <workItem from="1760903620950" duration="712000" />
+      <workItem from="1760921946812" duration="1553000" />
+      <workItem from="1760990517731" duration="7868000" />
+      <workItem from="1761051598084" duration="1340000" />
+      <workItem from="1761340355206" duration="41000" />
+      <workItem from="1761373386867" duration="561000" />
+      <workItem from="1761374013108" duration="1020000" />
+      <workItem from="1761444344736" duration="346000" />
+      <workItem from="1761499961630" duration="747000" />
+      <workItem from="1761500808358" duration="450000" />
+      <workItem from="1761501275571" duration="211000" />
+      <workItem from="1761501522044" duration="73000" />
+      <workItem from="1761501613899" duration="31000" />
+      <workItem from="1761501657582" duration="55000" />
+      <workItem from="1761501790760" duration="1603000" />
+    </task>
+    <servers />
+  </component>
+  <component name="TypeScriptGeneratedFilesManager">
+    <option name="version" value="3" />
+  </component>
+  <component name="com.intellij.coverage.CoverageDataManagerImpl">
+    <SUITE FILE_PATH="coverage/20252_g1_pi1_butifarra$.coverage" NAME=" Coverage Results" MODIFIED="1760901975436" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+  </component>
+</project>
