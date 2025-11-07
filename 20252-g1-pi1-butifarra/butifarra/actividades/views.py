@@ -181,12 +181,11 @@ class UserProfileRegistrationForm(UserCreationForm):
 
         if commit:
             user.save()
-            UserProfile.objects.create(
-                user=user,
-                phone_number=self.cleaned_data["phone_number"],
-                program=self.cleaned_data["program"],
-                semester=self.cleaned_data["semester"],
-            )
+            profile, _ = UserProfile.objects.get_or_create(user=user)
+            profile.phone_number = self.cleaned_data["phone_number"]
+            profile.program = self.cleaned_data["program"]
+            profile.semester = self.cleaned_data["semester"]
+            profile.save()
 
         return user
 
