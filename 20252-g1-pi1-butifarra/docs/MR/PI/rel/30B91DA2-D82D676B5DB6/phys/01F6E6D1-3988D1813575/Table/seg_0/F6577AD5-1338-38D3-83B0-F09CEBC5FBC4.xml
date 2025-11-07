@@ -1,0 +1,92 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<TableProxyOraclev20c class="oracle.dbtools.crest.model.design.storage.oracle.v20c.TableProxyOraclev20c" name="enrollments" directorySegmentName="seg_0" id="F6577AD5-1338-38D3-83B0-F09CEBC5FBC4">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<logging>YES</logging>
+<partitionedRowMovement>DISABLE</partitionedRowMovement>
+<temporaryChanged>false</temporaryChanged>
+<accessDriverType>oracle_loader</accessDriverType>
+<rejectLimit></rejectLimit>
+<columnProxies itemClass="oracle.dbtools.crest.model.design.storage.oracle.v12c.ColumnProxyOraclev12c">
+<ColumnProxy name="status" id="005073A9-0D3F-D948-D777-3CE21E719D3D">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="id" id="4A6A9B7B-3001-D5D0-B716-03DB7ED03468">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<autoIncrementDDL>IDENTITY_CLAUSE</autoIncrementDDL>
+</ColumnProxy>
+<ColumnProxy name="enrolled_at" id="569F04DD-171C-3331-864C-FB9676EB767E">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<defaultValue>SYSTIMESTAMP</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="attended" id="647EE465-F942-7776-9FED-72D7533098DC">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<defaultValue>0</defaultValue>
+</ColumnProxy>
+<ColumnProxy name="student_id" id="88D7F1BD-F604-8435-738F-BC9B5DA5BFAA">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="activity_id" id="E895DAB1-3122-3544-2B0F-BBA1F2579924">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ColumnProxy>
+<ColumnProxy name="role" id="F0E4E474-49E2-7516-8ED1-328B84300D09">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ColumnProxy>
+</columnProxies>
+<indexProxies>
+<IndexProxy class="oracle.dbtools.crest.model.design.storage.oracle.v10g.IndexProxyOraclev10g" name="idx_enrollments_activity" id="6A0A96D5-6107-FE1B-C1D8-80AE94633FF3">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<logging></logging>
+</IndexProxy>
+</indexProxies>
+<foreignKeys>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="enrollments_students_FK" id="36B17DC6-09EE-0A5A-B36C-8694402642BB">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="enrollments_enrollment_status_FK" id="CC92667F-88B9-C507-FD7D-4D708FEDE6F7">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ForeignKey>
+<ForeignKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.FKProxyOraclev10g" name="enrollments_activities_FK" id="FF7C6233-5B9B-9B9A-494D-56303F946529">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+</ForeignKey>
+</foreignKeys>
+<primaryKeys>
+<PrimaryKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.PKProxyOraclev10g" name="enrollments_PK" id="9870224D-F759-E19F-5C7C-BDEC958225E6">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</PrimaryKey>
+</primaryKeys>
+<uniqueKeys>
+<UniqueKey class="oracle.dbtools.crest.model.design.storage.oracle.v10g.UniqueOraclev10g" name="uq_enrollment" id="1C968943-5BA4-EBFF-5D4F-EC0DC3193221">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexSort>SORTED</indexSort>
+</UniqueKey>
+</uniqueKeys>
+</TableProxyOraclev20c>

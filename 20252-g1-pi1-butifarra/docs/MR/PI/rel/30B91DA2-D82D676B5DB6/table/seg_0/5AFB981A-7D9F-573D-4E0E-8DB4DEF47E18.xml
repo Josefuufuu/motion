@@ -1,0 +1,90 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="5AFB981A-7D9F-573D-4E0E-8DB4DEF47E18" name="team_members">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>7DC9E6F2-DE92-7BCD-1CCE-6E09464C5474</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="team_id" id="A0B8D3B0-7346-D25D-FDDF-701F0E3ADCA7">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0A54B7F1-30D1-990F-9253-02B534212C98</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9153D94C-AAEA-0781-2190-DE3517C3AF70" referredColumn="47AF67B5-4DC8-B6F6-BDD3-78C423823E2D"/>
+</associations>
+</Column>
+<Column name="student_id" id="B99A8D0B-1506-16C2-8838-56B836794C30">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>AE431597-0C86-14E4-C5B5-EF4A3B291A94</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6ADC8E2B-8188-90F9-9091-3E02C3DCE187" referredColumn="ACA2EBED-1BC9-286E-8720-CFFFAE4C6D94"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="637706C8-6B95-B8CA-580C-DF2A6ED99D2C" name="pk_team_members">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>17186074-0550-BF68-3B68-7493730F3594</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A0B8D3B0-7346-D25D-FDDF-701F0E3ADCA7"/>
+<colUsage columnID="B99A8D0B-1506-16C2-8838-56B836794C30"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="CD165046-EEEF-B41A-D922-60CCC93BC28E" name="idx_team_members_student">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>22A178AC-0337-9122-0D2A-3055C9076F51</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B99A8D0B-1506-16C2-8838-56B836794C30"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="BB1113E5-39B8-DE88-6DB0-19AF42E5CDB1" name="team_members_students_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B99A8D0B-1506-16C2-8838-56B836794C30"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="C7C7492D-9874-A152-43B1-C422E01389C8" name="team_members_teams_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="A0B8D3B0-7346-D25D-FDDF-701F0E3ADCA7"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

@@ -1,0 +1,171 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="27EFCE13-959B-F13A-0D3A-43353B9B0D91" name="appointments">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>89719A7F-D5F2-E2FA-C07B-8B5A88DF18CC</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="2D07FED6-6B7E-41AE-3749-D2004C6223AB">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>A88A9F66-2194-A2E8-B0CF-D8610A0A66DC</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<identityColumn>true</identityColumn>
+<autoIncrementGenerateAlways>true</autoIncrementGenerateAlways>
+<autoIncrementCycle>false</autoIncrementCycle>
+<autoIncrementOrder>false</autoIncrementOrder>
+</Column>
+<Column name="appointment_date" id="9D7965A3-535A-A0F7-ECE7-87EC03D19D25">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0792750D-C8EE-B9DB-1A57-3F371B314ADF</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<domain>0F71A4BD-9D53-9928-FB9E-A56BE89508D2</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="duration_minutes" id="9F462F4B-9A30-9FEF-7D61-1F7B274D9A84">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>DC4E6818-F492-01CC-2CF5-46E508FA4C95</importedID>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>FEA64C54-C270-EEE4-60F9-B091CB55ED04</domain>
+<checkConstraint>
+<implementationDef dbType="Oracle Database 21c" definition="duration_minutes &gt; 0"/>
+</checkConstraint>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="status" id="E724A057-B42A-3707-CCBE-1466E5358C06">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>79703AB0-EEC3-2A7C-99BD-72DF6D04F952</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DDE947EB-82B0-7E5C-EFE7-01C1F66F9269" referredColumn="68625320-D142-2B40-6DE3-B010BD1F8453"/>
+</associations>
+</Column>
+<Column name="student_id" id="C92EAA1A-7900-74B0-B98E-EE31EE5CCC96">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0061509D-6EE5-9231-C920-3B3DC28E0082</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="DA0B9D9C-0564-A942-86C8-C58DA1499B7A" referredColumn="ACA2EBED-1BC9-286E-8720-CFFFAE4C6D94"/>
+</associations>
+</Column>
+<Column name="psychologist_id" id="CDE533C9-8C2F-E76A-BE7B-1D0B5ACE2D6B">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>CFDD03FA-0C76-C6D0-D946-7F5DAC2ADA38</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="F28E19DD-3FBE-2EC5-F892-AFEDB51ECA96" referredColumn="8862801F-7348-CA79-B141-73C12CE54FDF"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="FA30A496-8940-41E5-1352-AF71B8CDB043" name="appointments_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>534EF13D-816D-1FFF-1AA5-5E82D471099F</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2D07FED6-6B7E-41AE-3749-D2004C6223AB"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6F2A0F7E-9E14-F75A-1B09-41732D42AE07" name="idx_appointments_student">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>3626ECBC-A82E-9398-15CD-4FCBA64E3080</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C92EAA1A-7900-74B0-B98E-EE31EE5CCC96"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F82860E6-A7E6-F764-1C9D-BCCE0EFBEB71" name="idx_appointments_psych">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>2718EC23-9A12-9ADE-F6AC-962B51F04F2C</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CDE533C9-8C2F-E76A-BE7B-1D0B5ACE2D6B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8CE7FC47-1436-05F1-00E6-C434B5844A24" name="appointments_appointment_status_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="E724A057-B42A-3707-CCBE-1466E5358C06"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="68F31017-C7CB-11A1-8AAC-A42E7B0D7123" name="appointments_psychologists_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="CDE533C9-8C2F-E76A-BE7B-1D0B5ACE2D6B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6791D02C-E0B3-9EE0-34C7-8245DF282807" name="appointments_students_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C92EAA1A-7900-74B0-B98E-EE31EE5CCC96"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

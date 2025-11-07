@@ -1,0 +1,143 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="25AA6342-D808-F204-89ED-BEAF42D83DB9" name="tournaments">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>53B6B044-9DFF-2F14-3EE4-8C2D0ECB5D71</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="8096AC44-61DA-5657-F233-FB90334832B1">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>7647E15F-0E68-07E6-B044-69E96A148053</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<identityColumn>true</identityColumn>
+<autoIncrementGenerateAlways>true</autoIncrementGenerateAlways>
+<autoIncrementCycle>false</autoIncrementCycle>
+<autoIncrementOrder>false</autoIncrementOrder>
+</Column>
+<Column name="tournament_type" id="4563F0E0-E447-65FB-47FE-172B38E0BB2E">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>E798126D-20FD-4112-CA6B-4380769CBB8C</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="1AAC6CA8-D459-2ED8-2C41-81CCC8372E11" referredColumn="C1C7C719-D75F-42E4-AA7D-7799E9A24D3E"/>
+</associations>
+</Column>
+<Column name="sport" id="3C87817B-5182-303B-076B-14F4FB8B2EBB">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>CD9280C4-021C-27E0-CAE6-009E7CCD78DC</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>333F4BD6-4611-CA38-C8A8-CFDA1DB79BB3</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="registration_deadline" id="10FB8D44-9F5E-32B6-8F20-8D3C5542B41B">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>83672F25-CBC1-1053-3B72-A8997D539C1D</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<domain>0F71A4BD-9D53-9928-FB9E-A56BE89508D2</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="max_teams" id="CA007D91-A8F7-377E-1CD7-4A71D1AC84ED">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>C62FFA0F-1A34-D5DB-D170-3832E5F809A1</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="team_size_min" id="0A8E85D5-4630-ACFC-D665-720FEB932749">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>851544A9-892B-5AB7-03B7-4F9113CE8675</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="team_size_max" id="4E42F863-B989-039E-DA4F-DDAC49832FEA">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>F3C21861-C23A-F188-5B7C-3491490C47E5</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="8626D51D-43FA-7630-EB15-E9F6210CA397" name="tournaments_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>6E61D72A-1ABD-0E2C-45F3-F05BCED1CAE0</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="8096AC44-61DA-5657-F233-FB90334832B1"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6BBA1206-3289-044F-90EF-7C2C8057D35D" name="tournaments_tournament_type_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4563F0E0-E447-65FB-47FE-172B38E0BB2E"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+<tableCheckConstraints itemClass="oracle.dbtools.crest.model.design.constraint.TableLevelConstraint">
+<tableCheckConstraint name="SYS_tournaments0" directorySegmentName="seg_0" id="8F3486C6-888F-AE1C-DC0C-5CE558ED362F">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>EB30383F-F1AD-2033-5C51-A0E974F94B8C</importedID>
+<rule><![CDATA[team_size_min IS NULL OR team_size_max IS NULL OR team_size_min <= team_size_max]]></rule>
+</tableCheckConstraint>
+</tableCheckConstraints>
+</Table>

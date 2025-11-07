@@ -5,20 +5,23 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d678effe-0d0d-45fb-8bea-3b99cc7f718b" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/ROLES_SETUP.md" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/butifarra/actividades/management/commands/create_user_profiles.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/App.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/App.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Dashboard/TopBar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Dashboard/TopBar.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Sidebar/RouteSelect.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Sidebar/RouteSelect.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Sidebar/RoleContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Sidebar/RoleContext.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Torneos/TournamentTable.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/components/Torneos/TournamentTable.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/context/AuthContext.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/context/AuthContext.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/ActivitiesCalendar.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/ActivitiesCalendar.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/hooks/useTorneos.js" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/hooks/useTorneos.js" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/ActivityDetailPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/ActivityDetailPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/AdminHomePage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/AdminHomePage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/AdminTorneosPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/AdminTorneosPage.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/CreateActivity.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/CreateActivity.jsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/GestionCadiPage.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/GestionCadiPage.jsx" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/HomeBeneficiary.jsx" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra-frontend/frontend-cadi/src/pages/HomeBeneficiary.jsx" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/butifarra/actividades/admin.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/admin.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra/actividades/models.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/models.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra/actividades/serializers.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/serializers.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/urls.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/urls.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/butifarra/actividades/views.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/views.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/butifarra/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/butifarra/settings.py" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -208,6 +211,11 @@
       <workItem from="1761501613899" duration="31000" />
       <workItem from="1761501657582" duration="55000" />
       <workItem from="1761501790760" duration="1603000" />
+      <workItem from="1761508177716" duration="6791000" />
+      <workItem from="1761568147437" duration="2017000" />
+      <workItem from="1761570244475" duration="59000" />
+      <workItem from="1761607959181" duration="213000" />
+      <workItem from="1761608393252" duration="8024000" />
     </task>
     <servers />
   </component>

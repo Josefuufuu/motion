@@ -1,0 +1,40 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="FC852CD2-2EBC-5CDC-31A4-1D90600D814D" name="activity_type">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>205C6307-FC7D-8B9F-4CD2-14D634A6ED4C</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="code" id="B91C4870-1311-B9CA-3D30-72C6587DC573">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0FE2851E-DED5-3A40-C204-107A3F817471</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="376385A7-C71A-4483-A0D6-8B80255BF71F" name="activity_type_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>1BE029A6-79EC-EB6B-40CE-8C44B6CE5EE1</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="B91C4870-1311-B9CA-3D30-72C6587DC573"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

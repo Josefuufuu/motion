@@ -1,0 +1,79 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="559A5A6E-6CC1-1521-EF6C-1986C61AFF17" name="psu_project_volunteers">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>238907B6-5FDA-3A4E-792A-870D9EBA1E6D</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="project_id" id="35BFF688-5B18-5336-00B6-E93F6A258846">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>09F2C2C9-F887-8156-38FE-5CF5708DAF1C</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="9D29AE4F-734A-E8A8-E68C-F17E33A7FB48" referredColumn="07CDDE58-41FF-4D3B-CACB-BE066F95BC82"/>
+</associations>
+</Column>
+<Column name="student_id" id="BA6B5AF0-5177-C794-EA76-68B735F6B97A">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>86A12E55-20A8-D1FD-7F84-0D1DB83D6ABF</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="133F197C-1F4C-CBA3-285A-AB9A11D54749" referredColumn="ACA2EBED-1BC9-286E-8720-CFFFAE4C6D94"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="4B645341-67AF-2E28-FCFE-285606477DE2" name="pk_psu_volunteers">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>383F8EA3-BB94-4777-E2B5-9FAE3C64547E</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="35BFF688-5B18-5336-00B6-E93F6A258846"/>
+<colUsage columnID="BA6B5AF0-5177-C794-EA76-68B735F6B97A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6C41EFA3-73BC-B459-62DC-FFDCA16D117E" name="psu_project_volunteers_psu_projects_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="35BFF688-5B18-5336-00B6-E93F6A258846"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="152775AA-9C6E-5578-AD9B-766A8680DA90" name="psu_project_volunteers_students_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="BA6B5AF0-5177-C794-EA76-68B735F6B97A"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

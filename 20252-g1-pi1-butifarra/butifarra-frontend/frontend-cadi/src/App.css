@@ -1,0 +1,604 @@
+:root {
+  --color-primary: #4f46e5;
+  --color-primary-hover: #4338ca;
+  --color-primary-dark: #3730a3;
+  --color-primary-light: #eef2ff;
+  --color-background: #f3f4f6;
+  --color-card: #ffffff;
+  --color-border: #d1d5db;
+  --color-text-primary: #1f2937;
+  --color-text-secondary: #6b7280;
+  --color-focus-ring: rgba(79, 70, 229, 0.25);
+  --color-danger: #dc2626;
+  --anim-duration-xs: 120ms;
+  --anim-duration-sm: 160ms;
+  --anim-duration-md: 240ms;
+  --anim-duration-lg: 400ms;
+  --anim-ease-standard: cubic-bezier(0.2, 0, 0, 1);
+  --anim-ease-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+  --anim-ease-emphasized: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --anim-distance-sm: 6px;
+  --anim-distance-md: 12px;
+  --anim-distance-lg: 24px;
+  --anim-surface-shadow: 0 16px 40px -24px rgba(15, 23, 42, 0.45);
+}
+
+body {
+  margin: 0;
+  font-family: 'Inter', system-ui, sans-serif;
+  background-color: var(--color-background);
+  color: var(--color-text-primary);
+  text-align: left;
+}
+
+/* --- Animation tokens --------------------------------------------------- */
+.transition-base {
+  transition-property: color, background-color, border-color, box-shadow, transform, opacity;
+  transition-duration: var(--anim-duration-sm);
+  transition-timing-function: var(--anim-ease-standard);
+}
+
+.motion-base {
+  opacity: 0;
+  transition-property: opacity, transform;
+  transition-duration: var(--anim-duration-lg);
+  transition-timing-function: var(--anim-ease-decelerate);
+}
+
+.motion-fade-in {
+  opacity: 0;
+}
+
+.motion-fade-up {
+  transform: translateY(var(--anim-distance-md));
+}
+
+.motion-fade-down {
+  transform: translateY(calc(var(--anim-distance-md) * -1));
+}
+
+.motion-fade-left {
+  transform: translateX(var(--anim-distance-lg));
+}
+
+.motion-fade-right {
+  transform: translateX(calc(var(--anim-distance-lg) * -1));
+}
+
+.motion-visible {
+  opacity: 1;
+  transform: none;
+}
+
+.interactive-card {
+  transition-property: transform, box-shadow, border-color, background-color, color;
+  transition-duration: var(--anim-duration-md);
+  transition-timing-function: var(--anim-ease-decelerate);
+}
+
+.interactive-card:hover {
+  transform: translateY(-4px);
+  box-shadow: var(--anim-surface-shadow);
+}
+
+.interactive-card:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px var(--color-focus-ring), var(--anim-surface-shadow);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .motion-base,
+  .motion-fade-in,
+  .motion-fade-up,
+  .motion-fade-down,
+  .motion-fade-left,
+  .motion-fade-right,
+  .interactive-card,
+  .transition-base {
+    transition-duration: 0.01ms !important;
+    transition-delay: 0ms !important;
+  }
+
+  .motion-fade-up,
+  .motion-fade-down,
+  .motion-fade-left,
+  .motion-fade-right,
+  .interactive-card:hover {
+    transform: none !important;
+  }
+
+  .motion-base,
+  .motion-fade-in,
+  .motion-visible {
+    opacity: 1 !important;
+  }
+}
+
+/* --- 3. ESTILOS PARA "CREAR ACTIVIDAD" Y "CALIFICACIONES" --- */
+.page-container { max-width: 1200px; margin: 48px auto; padding: 0 24px; }
+.create-activity-layout { display: flex; gap: 32px; }
+.form-column { flex: 2; min-width: 0; }
+.preview-column { flex: 1; min-width: 0; }
+@media (max-width: 1024px) { .create-activity-layout { flex-direction: column; } }
+
+.page-header {
+  text-align: center; margin-bottom: 32px; padding: 40px 32px;
+  background-color: var(--color-primary-dark); border-radius: 16px;
+}
+.page-header h1 { font-size: 2.5rem; font-weight: 700; margin: 0 0 8px 0; color: white; }
+.page-header p { font-size: 1.1rem; color: #e0e7ff; margin: 0; }
+
+.form-card {
+  background-color: var(--color-card); padding: 40px;
+  border-radius: 16px; border: 1px solid var(--color-border);
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07);
+}
+.form-grid {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 24px 28px;
+}
+.form-field { display: flex; flex-direction: column; }
+.form-field.full-width { grid-column: 1 / -1; }
+.form-field label { font-weight: 500; font-size: 0.9rem; margin-bottom: 8px; }
+.form-field label:has(+ :required)::after { content: " *"; color: var(--color-danger); }
+
+.form-field input, .form-field select, .form-field textarea {
+  width: 100%; padding: 12px; border: 1px solid var(--color-border);
+  border-radius: 8px; font-size: 1rem; font-family: inherit;
+  transition: border-color 0.2s, box-shadow 0.2s; box-sizing: border-box;
+}
+.form-field input:focus, .form-field select:focus, .form-field textarea:focus {
+  outline: none; border-color: var(--color-primary);
+  box-shadow: 0 0 0 4px var(--color-focus-ring);
+}
+.form-actions {
+  display: flex; justify-content: flex-end; gap: 12px;
+  margin-top: 32px; padding-top: 24px; border-top: 1px solid var(--color-border);
+}
+
+.btn {
+  border: none; padding: 12px 24px; border-radius: 8px;
+  font-weight: 600; font-size: 1rem; cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.btn-primary { background-color: var(--color-primary); color: white; }
+.btn-primary:hover { background-color: var(--color-primary-hover); }
+.btn-secondary { background-color: transparent; color: var(--color-primary); border: 1px solid var(--color-primary); }
+.btn-secondary:hover { background-color: var(--color-primary-light); }
+
+/* --- Estilos especiales para el campo de subir archivo --- */
+.form-field input[type="file"] {
+  font-family: inherit;
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+}
+
+/* Oculta el texto por defecto del navegador ("No se ha seleccionado...") */
+.form-field input[type="file"]::-webkit-file-upload-button {
+  /* Le damos la apariencia de nuestro botón secundario */
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  margin-right: 16px; /* Espacio entre el botón y el nombre del archivo */
+  transition: all 0.2s ease-in-out;
+}
+
+.form-field input[type="file"]::-webkit-file-upload-button:hover {
+  background-color: var(--color-primary-light);
+}
+
+/* --- 4. ESTILOS DE VISTA PREVIA Y COMENTARIOS --- */
+.activity-preview-card {
+  background-color: var(--color-card);
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  position: sticky;
+  top: 32px;
+}
+.preview-header {
+  padding: 12px 16px;
+  font-weight: 600;
+  border-bottom: 1px solid var(--color-border);
+  color: var(--color-text-secondary);
+}
+.preview-content {
+  padding: 24px;
+}
+.preview-image-container {
+  width: 100%;
+  height: 150px;
+  margin-bottom: 16px;
+  border-radius: 8px;
+  background-color: var(--color-background);
+  overflow: hidden;
+}
+.preview-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.preview-image-placeholder {
+  width: 100%;
+  height: 100%;
+  display: grid;
+  place-items: center;
+  font-size: 2rem;
+  color: var(--color-text-secondary);
+}
+.preview-title {
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin: 0 0 8px;
+}
+.preview-tags {
+  display: flex;
+  gap: 8px;
+  margin-bottom: 16px;
+}
+.preview-tag {
+  background-color: var(--color-primary-light);
+  color: var(--color-primary);
+  padding: 4px 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  border-radius: 999px;
+}
+.preview-details {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  color: var(--color-text-secondary);
+}
+.preview-description {
+  font-size: 0.9rem;
+  color: var(--color-text-secondary);
+  margin-top: 16px;
+  padding-top: 16px;
+  border-top: 1px solid var(--color-border);
+  white-space: pre-wrap;
+  max-height: 100px;
+  overflow-y: auto;
+}
+
+/* --- Estilos de la Lista de Comentarios y Edición --- */
+.comment-list {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+.comment-list h3 {
+  margin: 0 0 16px 0;
+}
+.comment-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border);
+}
+.comment-item:last-child {
+  border-bottom: none;
+  padding-bottom: 0;
+}
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+.comment-author { font-weight: 600; }
+.comment-date { font-size: 0.8rem; color: var(--color-text-secondary); }
+.comment-text {
+  margin: 8px 0 0 0;
+  white-space: pre-wrap;
+  overflow-wrap: break-word;
+}
+
+/* --- Contenedor de botones "Editar" y "Eliminar" --- */
+.comment-actions {
+  margin-top: 12px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+}
+
+/* --- Botón de Editar --- */
+.edit-button {
+  background-color: transparent;
+  color: var(--color-primary);
+  border: 1px solid var(--color-primary);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.edit-button:hover {
+  background-color: var(--color-primary-light);
+}
+
+/* --- Botón de Eliminar --- */
+.delete-button {
+  background-color: transparent;
+  color: var(--color-danger);
+  border: 1px solid var(--color-danger);
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease-in-out;
+}
+.delete-button:hover {
+  background-color: #fee2e2;
+  color: #b91c1c;
+}
+
+/* --- Contenedor de edición "in-place" --- */
+.editing-container {
+  width: 100%;
+  padding: 16px;
+  background-color: var(--color-background);
+  border-radius: 12px;
+  border: 1px solid var(--color-border);
+}
+.editing-container .footer {
+  justify-content: flex-end;
+}
+.editing-container .char-counter {
+  display: none;
+}
+.cancel-button {
+  background: none;
+  border: none;
+  color: var(--color-text-secondary);
+  cursor: pointer;
+  font-weight: 600;
+  margin-top: 8px;
+  padding: 4px 8px;
+}
+.cancel-button:hover {
+  text-decoration: underline;
+}
+/* --- 5. ESTILOS PARA LA PÁGINA "GESTIÓN DE NOTIFICACIONES" --- */
+@keyframes fadeInUp {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.notifications-page .title { font-size: 2rem; font-weight: 700; margin: 0 0 8px; }
+.notifications-page .subtitle { color: var(--color-text-secondary); margin: 0; }
+.page-header-notifications {
+  display: flex; justify-content: space-between;
+  align-items: flex-start; margin-bottom: 24px;
+}
+.tabs-nav {
+  display: flex; gap: 8px; margin-bottom: 24px;
+  border-bottom: 1px solid var(--color-border);
+}
+.tab {
+  padding: 10px 16px; border: none; background: none; cursor: pointer;
+  font-weight: 600; color: var(--color-text-secondary);
+  border-bottom: 2px solid transparent; position: relative; top: 1px;
+  white-space: nowrap;
+}
+.tab.active { color: var(--color-primary); border-bottom-color: var(--color-primary); }
+
+.kpi-grid-notifications { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-bottom: 32px; }
+.kpi-card-notifications {
+  background-color: var(--color-card); padding: 24px;
+  border-radius: 16px; border: 1px solid var(--color-border);
+  transition: all 0.2s ease-in-out;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+.kpi-card-notifications:hover { transform: translateY(-5px); box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.07); }
+.kpi-header { display: flex; justify-content: space-between; align-items: center; }
+.kpi-label { font-weight: 500; color: var(--color-text-secondary); }
+.kpi-icon { color: var(--color-text-secondary); }
+.kpi-value { font-size: 2.25rem; font-weight: 700; margin: 8px 0 0; }
+
+.campaign-table-card {
+  background-color: var(--color-card);
+  border-radius: 16px; border: 1px solid var(--color-border);
+  animation: fadeInUp 0.5s ease-out 0.3s forwards;
+  opacity: 0;
+}
+.table-header { padding: 24px; border-bottom: 1px solid var(--color-border); }
+.table-title { margin: 0 0 4px; font-size: 1.25rem; font-weight: 600; }
+.table-subtitle { color: var(--color-text-secondary); }
+
+.table-container { /* No necesitamos overflow */ }
+.campaign-table { width: 100%; border-collapse: collapse; }
+.campaign-table th, .campaign-table td {
+  padding: 16px 24px; text-align: left;
+  border-bottom: 1px solid var(--color-border);
+  white-space: nowrap;
+}
+.campaign-table tbody tr:last-child td { border-bottom: none; }
+.campaign-table tbody tr:hover { background-color: var(--color-background); }
+
+.campaign-table th { font-size: 0.8rem; text-transform: uppercase; color: var(--color-text-secondary); font-weight: 600; }
+.campaign-name { font-weight: 600; }
+.campaign-type, .metric-subtitle { font-size: 0.9rem; color: var(--color-text-secondary); }
+.metric-value { font-weight: 600; }
+.status-badge { display: inline-block; padding: 4px 12px; border-radius: 999px; font-weight: 600; font-size: 0.8rem; }
+.status-badge.programada { background-color: #cffafe; color: #0891b2; }
+
+.action-buttons { display: flex; gap: 8px; }
+.action-btn {
+  background-color: var(--color-background); border: 1px solid var(--color-border);
+  padding: 8px; border-radius: 8px; cursor: pointer;
+  display: grid; place-items: center; color: var(--color-text-secondary);
+  position: relative; transition: all 0.2s ease-in-out;
+}
+.action-btn:hover { background-color: var(--color-primary); color: white; border-color: var(--color-primary); }
+.action-btn::after {
+  content: attr(data-tooltip); position: absolute;
+  bottom: 125%; left: 50%; transform: translateX(-50%);
+  background-color: var(--color-text-primary); color: white;
+  padding: 4px 8px; border-radius: 4px; font-size: 0.8rem;
+  white-space: nowrap; opacity: 0; visibility: hidden;
+  transition: opacity 0.2s, visibility 0.2s;
+  pointer-events: none;
+}
+.action-btn:hover::after { opacity: 1; visibility: visible; }
+
+/* --- ESTILOS PARA EL FORMULARIO DE "CREAR NOTIFICACIÓN" --- */
+
+.create-notification-layout {
+  display: grid;
+  grid-template-columns: 2fr 1.2fr; /* Columna izquierda más ancha */
+  gap: 32px;
+  animation: fadeInUp 0.5s ease-out forwards;
+}
+@media (max-width: 1024px) {
+  .create-notification-layout { grid-template-columns: 1fr; }
+}
+
+.notification-form-card {
+  background-color: var(--color-card);
+  padding: 32px;
+  border-radius: 16px;
+  border: 1px solid var(--color-border);
+  box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.05);
+}
+
+.form-section-title {
+  font-size: 1.5rem;
+  font-weight: 600;
+  margin: 0 0 4px;
+}
+
+.form-section-subtitle {
+  color: var(--color-text-secondary);
+  margin: 0 0 32px;
+}
+
+.notification-form {
+  margin-top: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+/* Estilos para los botones de radio */
+.radio-group { display: flex; flex-direction: column; gap: 16px; }
+.radio-option { display: flex; align-items: center; gap: 10px; }
+.radio-option label { font-weight: 500; cursor: pointer; }
+.radio-option input { 
+  cursor: pointer;
+  accent-color: var(--color-primary); /* Pinta el radio button de azul cuando está seleccionado */
+  width: 16px; height: 16px;
+}
+
+/* Estilos para el switch de Programación */
+.schedule-toggle {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+.toggle-switch-bg {
+  width: 36px; height: 20px;
+  background-color: #ccc;
+  border-radius: 999px;
+  padding: 2px;
+  cursor: pointer;
+}
+.toggle-switch-fg {
+  width: 16px; height: 16px;
+  background-color: white;
+  border-radius: 50%;
+}
+
+.schedule-inputs {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+}
+
+/* Estilos para los botones de acción del formulario */
+.form-actions-notifications {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 24px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border);
+}
+
+/* --- Estilos para la Fila de la Tabla al ser Eliminada --- */
+.campaign-row-hiding {
+  opacity: 0;
+  transform: scale(0.95);
+  transition: all 0.3s ease-in-out;
+}
+
+/* --- Estilos para el Botón de Eliminar --- */
+.action-btn.delete {
+  color: var(--color-danger);
+}
+.action-btn.delete:hover {
+  background-color: var(--color-danger);
+  border-color: var(--color-danger);
+  color: white;
+}
+
+/* --- Estilos para el Toast --- */
+@keyframes slideInUp {
+  from { transform: translateY(100%); opacity: 0; }
+  to { transform: translateY(0); opacity: 1; }
+}
+@keyframes slideOutDown {
+  from { transform: translateY(0); opacity: 1; }
+  to { transform: translateY(100%); opacity: 0; }
+}
+
+.toast-container {
+  position: fixed;
+  bottom: 24px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: var(--color-text-primary);
+  color: white;
+  padding: 12px 24px;
+  border-radius: 8px;
+  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2);
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  z-index: 1000;
+  animation: slideInUp 0.5s ease-out forwards;
+}
+
+.undo-button {
+  background: none;
+  border: none;
+  color: var(--color-primary-light);
+  font-weight: 700;
+  cursor: pointer;
+  padding: 4px 8px;
+}
+.undo-button:hover {
+  text-decoration: underline;
+}
+
+  /* Contador de deshacer para torneos */
+
+  @keyframes shrink {
+  from {
+    width: 100%;
+  }
+  to {
+    width: 0%;
+  }
+}
+
+/* Crea una clase de utilidad para aplicar esta animación */
+.animate-shrink {
+  animation: shrink 5s linear forwards;
+}

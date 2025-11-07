@@ -1,0 +1,43 @@
+.comment-list {
+  margin-top: 32px;
+  padding-top: 24px;
+  border-top: 1px solid var(--color-border, #e5e7eb);
+}
+
+.comment-list h3 {
+  margin: 0 0 16px 0;
+}
+
+.comment-item {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--color-border, #e5e7eb);
+}
+.comment-item:last-child {
+  border-bottom: none;
+}
+
+.comment-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+}
+
+.comment-author {
+  font-weight: 600;
+}
+
+.comment-date {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.comment-text {
+  margin: 8px 0 0 0;
+  white-space: pre-wrap; /* Para respetar los saltos de línea */
+}
+
+.no-comments-message {
+  color: var(--color-text-secondary, #6b7280);
+  font-style: italic;
+}

@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="17B591AD-B2B0-8A5C-8F23-29D8E84DB086" containerWithKeyObject="C872C86B-F7C5-2457-A08F-03E80EA73EA9" localFKIndex="6FE7837D-138E-DDBF-DBB1-8D3A31399FE1" name="schedule_items_schedules_FK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>052D7A31-8CFE-546F-BACE-389EC99C6C05</importedID>
+<referredTableLongName>schedules</referredTableLongName>
+<deleteRule>CASCADE</deleteRule>
+<referredTableID>C3B74FD9-A439-C66D-70BA-F92631A70E80</referredTableID>
+<keyObject>537D43DB-708F-49B6-C2CF-D07760F1D223</keyObject>
+<referredKeyID>537D43DB-708F-49B6-C2CF-D07760F1D223</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="1833F403-029A-4CD2-6C69-8BC65CC29FBC" containerWithKeyObject="762CDED7-42AF-0C15-9DDF-6F115CD1D46C" localFKIndex="074DD1B9-C943-8C3F-1013-280176753738" name="feedback_activities_FK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0EC3BF6E-D5B7-CABE-D1D8-D2CFF4FB4249</importedID>
+<referredTableLongName>activities</referredTableLongName>
+<deleteRule>CASCADE</deleteRule>
+<referredTableID>5224C20C-8935-506D-B495-13F283907802</referredTableID>
+<keyObject>0642C799-5BF3-EC65-024B-F457CB301C83</keyObject>
+<referredKeyID>0642C799-5BF3-EC65-024B-F457CB301C83</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>id</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

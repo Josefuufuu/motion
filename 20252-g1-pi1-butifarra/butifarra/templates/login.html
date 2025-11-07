@@ -1,0 +1,6 @@
+<!-- templates/login.html -->
+<form method="POST">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <button type="submit">Iniciar sesión</button>
+</form>

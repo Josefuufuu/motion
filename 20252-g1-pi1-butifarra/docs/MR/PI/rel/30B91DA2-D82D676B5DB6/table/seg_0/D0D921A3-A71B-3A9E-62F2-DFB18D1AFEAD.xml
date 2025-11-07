@@ -1,0 +1,78 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="D0D921A3-A71B-3A9E-62F2-DFB18D1AFEAD" name="teachers">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>763F9C5D-0EC6-1EA1-2885-B3498772C55A</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="user_id" id="94BB04B8-B7F3-126E-C145-E41AD2DDD38B">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>5876FB61-6E9A-B558-084C-47CE6C0D48D5</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="E5CEC6C5-53B8-E0D4-3345-8A0CF96B7387" referredColumn="85BD2846-8EFE-B9E4-0E97-644A47A50141"/>
+</associations>
+</Column>
+<Column name="teacher_code" id="5A37626E-8A06-993F-2B0C-3D8B18C9FCE0">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>D7586991-FAA3-5988-5162-DC38F21ED284</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A349C874-576B-F6FB-2337-DA5B0DBD950D" name="teachers_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>26C13F94-A414-87A3-7FB4-1490C942B773</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="94BB04B8-B7F3-126E-C145-E41AD2DDD38B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="A1774379-8003-CACC-CFC9-57CCF73FFAE4" name="INDEX_1v4">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>92D507A0-EED6-82BA-B18E-924BB6E5AC8E</importedID>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5A37626E-8A06-993F-2B0C-3D8B18C9FCE0"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="DED0151F-ACE1-22A5-C2CA-09F37FD56E3A" name="teachers_users_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="94BB04B8-B7F3-126E-C145-E41AD2DDD38B"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

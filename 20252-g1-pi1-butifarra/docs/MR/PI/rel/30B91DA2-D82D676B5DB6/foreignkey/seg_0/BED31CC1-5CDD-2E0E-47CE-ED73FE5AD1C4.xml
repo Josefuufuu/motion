@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="BED31CC1-5CDD-2E0E-47CE-ED73FE5AD1C4" containerWithKeyObject="72F40B29-A6A0-7BE7-AAC2-2801D49C8C4E" localFKIndex="31A7E0AC-ABCE-AEF7-6EA1-2EDBA8236147" name="matches_match_status_FK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>106E223A-596B-089E-82A7-0BDEF2D5C2E6</importedID>
+<referredTableLongName>match_status</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>E17FDB1F-2063-496B-ED3A-032F62B26E0E</referredTableID>
+<keyObject>38A2CFCA-0254-4181-C904-DB93605DDD6B</keyObject>
+<referredKeyID>38A2CFCA-0254-4181-C904-DB93605DDD6B</referredKeyID>
+<mandatory>false</mandatory>
+<refColNames>code</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="1AAC6CA8-D459-2ED8-2C41-81CCC8372E11" containerWithKeyObject="25AA6342-D808-F204-89ED-BEAF42D83DB9" localFKIndex="6BBA1206-3289-044F-90EF-7C2C8057D35D" name="tournaments_tournament_type_FK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>ADF0447F-EBF6-D555-BA57-92DDEC0AB831</importedID>
+<referredTableLongName>tournament_type</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>ECC634ED-0494-84A1-2444-B29F0B6A3E0B</referredTableID>
+<keyObject>D5A89E7E-5FA1-DDB6-B2E9-33A08303EDC0</keyObject>
+<referredKeyID>D5A89E7E-5FA1-DDB6-B2E9-33A08303EDC0</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>code</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

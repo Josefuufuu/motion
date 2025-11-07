@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<BusinessInfoDesign class="oracle.dbtools.crest.model.businessinfo.BusinessInfoDesign" name="Business Information" id="71160BBC-851D-30D1-8428-7FE5914A6BAA">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:41:12 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</BusinessInfoDesign>

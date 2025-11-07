@@ -1,0 +1,18 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<FKIndexAssociation class="oracle.dbtools.crest.model.design.relational.FKIndexAssociation" directorySegmentName="seg_0" id="F98359B4-A3AE-DCF8-7955-051AED161C54" containerWithKeyObject="A211F2C3-885F-C725-B3ED-99DA6DF1840E" localFKIndex="1A1E5911-E73F-568F-D482-62DAA63BC424" name="notifications_notification_status_FK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>1C55CB8F-DE1D-D093-55D8-BD8E2D08B9D3</importedID>
+<referredTableLongName>notification_status</referredTableLongName>
+<deleteRule>NO ACTION</deleteRule>
+<referredTableID>EB67029B-2E9C-9220-4425-21CC519D5040</referredTableID>
+<keyObject>C2D351A1-78DD-2AB0-BED0-76729BCBA242</keyObject>
+<referredKeyID>C2D351A1-78DD-2AB0-BED0-76729BCBA242</referredKeyID>
+<mandatory>true</mandatory>
+<refColNames>code</refColNames>
+<transferable>true</transferable>
+<rely>false</rely>
+<columnDependencyConstraintGenerateInDDL>true</columnDependencyConstraintGenerateInDDL>
+</FKIndexAssociation>

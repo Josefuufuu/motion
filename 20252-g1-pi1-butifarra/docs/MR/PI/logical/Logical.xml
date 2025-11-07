@@ -1,0 +1,7 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<LogicalDesign class="oracle.dbtools.crest.model.design.logical.LogicalDesign" name="Logical" id="0F4A7CE3-7D28-C39F-FA74-169D31EC224B" mainViewID="AC848ADC-0F9E-E656-9DD4-D649840DAF4D">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:41:11 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<shouldBeOpen>false</shouldBeOpen>
+</LogicalDesign>

@@ -1,0 +1,13 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<OSDM_Design class="oracle.dbtools.crest.model.design.Design" name="PI" id="7DE24AB2-18AD-AB02-6049-64B0BD4EE9BB" version="3.5">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:41:11 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<capitalNames>false</capitalNames>
+<designId>7DE24AB2-18AD-AB02-6049-64B0BD4EE9BB</designId>
+<usedDesignStorageDescriptors>
+<designDescr class="oracle.dbtools.crest.model.design.Design$DesignStorageDesc" id="9297378B-743D-DEC1-F62B-8C77E8763EB9">
+<designStoragePath>C:\mr</designStoragePath>
+</designDescr>
+</usedDesignStorageDescriptors>
+</OSDM_Design>

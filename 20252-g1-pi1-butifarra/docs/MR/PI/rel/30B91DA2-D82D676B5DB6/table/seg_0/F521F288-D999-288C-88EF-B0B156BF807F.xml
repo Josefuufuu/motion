@@ -1,0 +1,95 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="F521F288-D999-288C-88EF-B0B156BF807F" name="students">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>936B1FF2-2DC9-C953-CDBF-3426D5B08799</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="user_id" id="ACA2EBED-1BC9-286E-8720-CFFFAE4C6D94">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>6E557840-380B-0DC2-5FEA-AA12B70DE929</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="11716DC6-487E-9F91-42A7-9B391E0CB1AE" referredColumn="85BD2846-8EFE-B9E4-0E97-644A47A50141"/>
+</associations>
+</Column>
+<Column name="student_code" id="C79E6D51-2334-8AFD-FCE4-3E6FA4AAEE77">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>156862BC-373B-0180-F9EC-677A1F0FA5C4</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="accumulated_points" id="4CC96696-771D-C5F9-2E77-0277AC147453">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>C212EF26-4C86-C270-A4EA-0DC0E68763F7</importedID>
+<useDomainConstraints>false</useDomainConstraints>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<checkConstraint>
+<implementationDef dbType="Oracle Database 21c" definition="accumulated_points &gt;= 0"/>
+</checkConstraint>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="FADF495A-6AAB-5FD8-2F56-4583D89AF091" name="students_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>040D0D63-1AAC-4832-F919-5589020F0747</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="ACA2EBED-1BC9-286E-8720-CFFFAE4C6D94"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="B8AC9B22-FF97-E62E-FBAB-EC67A5A2F9D2" name="INDEX_1v3">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>CA2CE7C8-D4FE-C8C2-04D9-CFFAFE8F5577</importedID>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="C79E6D51-2334-8AFD-FCE4-3E6FA4AAEE77"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D34030DF-435F-4F90-C5CE-D4138F5D91FA" name="students_users_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="ACA2EBED-1BC9-286E-8720-CFFFAE4C6D94"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

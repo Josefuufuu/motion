@@ -1,0 +1,61 @@
+.rating-comment-container {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.rating-comment-container.disabled {
+  opacity: 0.7;
+}
+
+.comment-textarea {
+  width: 100%;
+  min-height: 80px;
+  padding: 12px;
+  border: 1px solid var(--color-border, #d1d5db);
+  border-radius: 8px;
+  font-size: 1rem;
+  font-family: inherit;
+  resize: vertical;
+  box-sizing: border-box;
+}
+.comment-textarea:focus {
+  outline: none;
+  border-color: var(--color-primary, #4f46e5);
+  box-shadow: 0 0 0 4px var(--color-focus-ring, rgba(79, 70, 229, 0.25));
+}
+
+.rating-comment-container .footer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.char-counter {
+  font-size: 0.8rem;
+  color: var(--color-text-secondary, #6b7280);
+}
+
+.save-button {
+  border: none;
+  padding: 10px 20px;
+  border-radius: 8px;
+  font-weight: 600;
+  cursor: pointer;
+  background-color: var(--color-primary, #4f46e5);
+  color: white;
+  transition: background-color 0.2s;
+}
+.save-button:hover {
+  background-color: var(--color-primary-hover, #4338ca);
+}
+.save-button:disabled {
+  background-color: #9ca3af;
+  cursor: not-allowed;
+}
+
+.error-message {
+  color: var(--color-danger, #dc2626);
+  font-size: 0.9rem;
+  margin: -8px 0 0 0;
+}

@@ -1,0 +1,185 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="337B9434-EF6C-79C6-8F5F-BDCE20F0E170" name="standings">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>D8210F22-D9AC-0AD0-66A6-422ED04124FF</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="tournament_id" id="1D73003B-D76D-C4D4-01E5-67FCB7379108">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>194B806D-28B2-FB8B-4B2F-1AF13A9037FA</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="19290D49-2DFD-1B4A-2239-75E13B74EA37" referredColumn="8096AC44-61DA-5657-F233-FB90334832B1"/>
+</associations>
+</Column>
+<Column name="team_id" id="9947E919-3FE5-AC14-CBA5-3DE4C35AB4A3">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0A13331B-A814-5F02-5C6E-B170E9B1602D</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="6ED3E860-02EB-BEEA-9C78-8A79E9AAE74C" referredColumn="47AF67B5-4DC8-B6F6-BDD3-78C423823E2D"/>
+</associations>
+</Column>
+<Column name="played" id="A7EB14F0-C867-BB1D-9F8C-82DBBD695C4D">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>7FEB165A-E4E1-4549-D4C2-A4296283F682</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="won" id="1103A52C-B0F2-54EB-4315-719F05954C1F">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>C33146A3-03FB-F50C-32CE-A1271FB5631F</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="drawn" id="C81C3E56-EDD1-6ED9-F120-C7006F31FA5F">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>3F1C15AC-CFD6-3E95-4C7D-CAF854EC7C86</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="lost" id="36B29762-EAC9-7FA3-5802-CB84CDA29A0E">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>1CA94EA6-DA8F-CF88-F6A2-E718F4707EC5</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="points" id="7C7DAA0A-63D3-4622-8F0F-89FEC1587185">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>925FCED6-313A-C279-8415-CEB9DC2359B2</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="goals_for" id="3201370F-4346-1745-124F-651A41C1F5E9">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>029F70F6-0FCF-0CB3-C940-28FA65F34171</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="goals_against" id="8C071C89-0F07-EBE2-E4DD-C7197DE41CB5">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0554269A-FE18-C307-A26A-4E0F31EDD6AF</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<defaultValue>0</defaultValue>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="goal_difference" id="A6F8F3CC-E61F-A7B6-E19C-C75796008F4F">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>EC7862BD-5EF4-DBA9-5D4B-959D516710FE</importedID>
+<formulaDesc>goals_for - goals_against</formulaDesc>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>A94D2235-C10B-F483-3CD8-9F46CAEA8B6F</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<computed>true</computed>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="39715968-5551-8B57-508A-5E0EECA79A47" name="pk_standings">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>C3F32A5A-FF76-9F48-5109-C58D662AB64D</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1D73003B-D76D-C4D4-01E5-67FCB7379108"/>
+<colUsage columnID="9947E919-3FE5-AC14-CBA5-3DE4C35AB4A3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="27CFD5E5-54FD-59A7-26FA-64FBEA5815F8" name="standings_teams_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="9947E919-3FE5-AC14-CBA5-3DE4C35AB4A3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="D09712E0-C2AF-560C-A3B2-68CED0AFB5FF" name="standings_tournaments_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="1D73003B-D76D-C4D4-01E5-67FCB7379108"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>

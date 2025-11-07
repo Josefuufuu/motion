@@ -1,0 +1,160 @@
+# -------------------------------
+# .gitignore — Proyecto BU-tifarra (monorepo)
+# Frontend (Vite/React), APIs Node/Python, Ops (Docker/Terraform/Ansible)
+# Mantiene fuera builds, artefactos temporales y secretos; conserva *.example
+# -------------------------------
+
+# ===== SO / IDE =====
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*.swo
+*~
+*.tmp
+.vscode/
+.idea/
+*.iml
+.history/
+.eslintcache
+.turbo/
+
+# ===== Node / JS / TS =====
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+.pnpm-debug.log*
+.parcel-cache/
+.nyc_output/
+coverage/
+*.tsbuildinfo
+
+# Yarn Berry (si aplica)
+.yarn/*
+!.yarn/patches
+!.yarn/plugins
+!.yarn/releases
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
+
+# ===== Frontend (Vite/React) =====
+dist/
+.vite/
+.cache/
+out/
+build/
+
+# ===== Backends Node (Express/Fastify/etc.) =====
+# Artefactos comunes de compilación o ejecución
+# (si usas ts-node o tsc outDir)
+**/build/
+**/out/
+# PM2/forever logs
+pm2-*.log
+pids/
+*.pid
+*.pid.lock
+
+# ===== Python (scripts, utilidades, pruebas) =====
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+.Python
+.pytest_cache/
+.tox/
+.nox/
+.mypy_cache/
+.pytype/
+.coverage
+.coverage.*
+.hypothesis/
+
+# ===== Java/Gradle/Maven (si algún micro usa Java) =====
+.gradle/
+**/build/
+**/target/
+# (No ignoramos jar/war por si el wrapper o binarios se versionan)
+!**/gradle/wrapper/gradle-wrapper.jar
+!.mvn/wrapper/maven-wrapper.jar
+
+# ===== Pruebas (E2E/UI) =====
+# Cypress
+cypress/screenshots/
+cypress/videos/
+# Playwright
+playwright-report/
+test-results/
+junit.xml
+
+# ===== Docker / Contenedores =====
+.docker/
+*.tar
+# Compose overrides locales
+docker-compose.override.yml
+# Archivos de entorno locales
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.schema
+!.env.local.example
+
+# ===== Terraform / IaC =====
+**/.terraform/
+**/.terraform.lock.hcl
+**/terraform.tfstate
+**/terraform.tfstate.*
+**/*.tfvars
+**/*.tfvars.json
+!**/*.tfvars.example
+# Planes locales
+**/*.tfplan
+
+# ===== Ansible =====
+*.retry
+
+# ===== Claves / Certificados / Credenciales =====
+*.pem
+*.key
+*.p12
+*.pfx
+*.cer
+*.crt
+*.csr
+*.der
+id_rsa
+id_rsa.*
+id_dsa
+id_ecdsa
+id_ed25519
+*.keystore
+*.jks
+.aws/
+.gcloud/
+azureauth.json
+
+# ===== Bases de datos locales / caches =====
+*.sqlite
+*.sqlite3
+*.db
+*.db-journal
+dump.rdb
+
+# ===== Logs =====
+logs/
+log/
+*.log
+*.log.*
+
+# ===== Nginx / servers locales =====
+**/nginx/**/logs/
+**/nginx/**/temp/
+
+# ===== Misc =====
+.tmp/
+temp/
+tmp/

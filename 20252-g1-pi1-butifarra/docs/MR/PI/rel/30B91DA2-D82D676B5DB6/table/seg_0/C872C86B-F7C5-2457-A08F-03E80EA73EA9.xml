@@ -1,0 +1,247 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="C872C86B-F7C5-2457-A08F-03E80EA73EA9" name="schedule_items">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>2F8C5648-C5B7-9B61-64C5-B36986B3C5EB</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="id" id="4F982700-3270-7800-2C67-F9E93F97C7D2">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>ECBFE74E-79B8-EE7C-581E-60D9A15ED29E</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementColumn>true</autoIncrementColumn>
+<identityColumn>true</identityColumn>
+<autoIncrementGenerateAlways>true</autoIncrementGenerateAlways>
+<autoIncrementCycle>false</autoIncrementCycle>
+<autoIncrementOrder>false</autoIncrementOrder>
+</Column>
+<Column name="schedule_id" id="5E6DB6A8-18D4-0CBD-8B1C-9111370B19DC">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>754272B9-35D6-4C03-BC0B-E64F0C7A0086</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="17B591AD-B2B0-8A5C-8F23-29D8E84DB086" referredColumn="16584BB3-74B4-ADB3-BFD6-18AE3302E7EE"/>
+</associations>
+</Column>
+<Column name="title" id="B06660E8-593D-13F6-2BEF-86A58FD492A9">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>CD6D75D2-D1E7-FA99-F482-8A0EDE35DBA9</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>92025BAA-F9AB-27B1-5449-25D74F9F2AAC</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="start_datetime" id="8860B3E0-5F3B-AB0E-CD1C-4077358A8524">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>482E64EA-E18C-39C4-19AD-7BC244BB651A</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<domain>0F71A4BD-9D53-9928-FB9E-A56BE89508D2</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="end_datetime" id="DEC29A16-C161-A43A-2B6C-1D78E664E0EC">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>6084BAA6-D4EE-3333-CC02-92BDC9F59EAC</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT046</logicalDatatype>
+<domain>0F71A4BD-9D53-9928-FB9E-A56BE89508D2</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="location" id="5DCC3047-232D-2C9D-EED7-5F88AE574E07">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>8F5B880E-7900-B244-A72C-567A197A3286</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>92025BAA-F9AB-27B1-5449-25D74F9F2AAC</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+<Column name="source_type" id="AF0D9A80-32CA-0B9A-E373-04C65676B3A3">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>5637B87F-7EE1-28BB-2076-2E5709C07A0A</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="7C0E3FBB-FCB8-509A-8D24-0F03B0408345" referredColumn="EEA9946C-3D40-791A-8EBD-D45080104141"/>
+</associations>
+</Column>
+<Column name="activity_id" id="36F20BF5-AED0-A3CE-C926-32445F478532">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>9AD09333-C5D0-37FD-A7D7-05E66E61BD40</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="AA39E643-BC3A-114B-93DA-D8A39F221D09" referredColumn="BDD99675-9432-500D-B6AF-D202C2168B25"/>
+</associations>
+</Column>
+<Column name="appointment_id" id="2C5BF71A-A7BC-B6E6-68AB-D77CBB1F80BE">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>9EEFEB44-8750-B8EE-E7DC-10C99C1E9EE9</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="D7BA3298-9EE0-DCCA-10C2-C86D0C8B1BA2" referredColumn="2D07FED6-6B7E-41AE-3749-D2004C6223AB"/>
+</associations>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="DCFB4925-DFCE-FF58-D8CE-581C8DF883E3" name="schedule_items_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>12C3DA59-FEB9-968F-459D-F3D4CB0815BC</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="4F982700-3270-7800-2C67-F9E93F97C7D2"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="AB3C5FAF-7CBD-D204-B455-36EBB411F424" name="idx_sched_items_sched">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>2001BC3B-C40B-3D81-1BD5-F6D4D820DF99</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5E6DB6A8-18D4-0CBD-8B1C-9111370B19DC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="9DF1DE60-4B34-E73E-17E3-794199DFF58C" name="idx_sched_items_act">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>E5668877-E619-3771-C3AC-B9B3BA53B927</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="36F20BF5-AED0-A3CE-C926-32445F478532"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="009826FD-F780-E3D7-2270-C8ED617664DA" name="idx_sched_items_appt">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>11CB6790-BACD-64EC-0710-E4318841D14B</importedID>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2C5BF71A-A7BC-B6E6-68AB-D77CBB1F80BE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="847B4FDB-862A-4D85-1F6D-378C0B18B77A" name="schedule_items_activities_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="36F20BF5-AED0-A3CE-C926-32445F478532"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="8C82CE96-AA4A-D322-8BBE-7D9F5398FA6D" name="schedule_items_appointments_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="2C5BF71A-A7BC-B6E6-68AB-D77CBB1F80BE"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="2459178C-EAAE-F959-55A6-C0D97F03E830" name="schedule_items_schedule_source_type_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="AF0D9A80-32CA-0B9A-E373-04C65676B3A3"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="6FE7837D-138E-DDBF-DBB1-8D3A31399FE1" name="schedule_items_schedules_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5E6DB6A8-18D4-0CBD-8B1C-9111370B19DC"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+<tableCheckConstraints itemClass="oracle.dbtools.crest.model.design.constraint.TableLevelConstraint">
+<tableCheckConstraint name="SYS_schedule_items0" directorySegmentName="seg_0" id="F044505D-9398-4A81-D609-7FAF18631938">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>75BCF542-FC30-F6C7-0A2E-1BA36D648895</importedID>
+<rule><![CDATA[end_datetime > start_datetime]]></rule>
+</tableCheckConstraint>
+<tableCheckConstraint name="SYS_schedule_items1" directorySegmentName="seg_0" id="A06EDEC5-EC2B-01FE-0C52-9F91AF9C4C29">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>9BB496F7-A9C8-F56E-5C75-CD67330C7F93</importedID>
+<rule><![CDATA[(CASE WHEN activity_id IS NOT NULL THEN 1 ELSE 0 END) + (CASE WHEN appointment_id IS NOT NULL THEN 1 ELSE 0 END) <= 1]]></rule>
+</tableCheckConstraint>
+</tableCheckConstraints>
+</Table>

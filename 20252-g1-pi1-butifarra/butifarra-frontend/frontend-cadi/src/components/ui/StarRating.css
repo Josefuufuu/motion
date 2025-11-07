@@ -1,0 +1,21 @@
+.star-rating-container {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+}
+
+/* Oculta los botones de radio redondos, solo queremos las estrellas */
+.star-rating-container input[type="radio"] {
+  display: none;
+}
+
+.star-rating-container .star {
+  cursor: pointer;
+  transition: color 0.2s;
+}
+
+/* Cuando el componente está deshabilitado */
+.star-rating-container.disabled .star {
+  cursor: not-allowed;
+  opacity: 0.6;
+}

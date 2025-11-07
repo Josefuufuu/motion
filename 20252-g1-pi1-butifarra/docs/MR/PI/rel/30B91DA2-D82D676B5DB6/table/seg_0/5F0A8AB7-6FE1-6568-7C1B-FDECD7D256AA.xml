@@ -1,0 +1,78 @@
+<?xml version = '1.0' encoding = 'UTF-8'?>
+<Table class="oracle.dbtools.crest.model.design.relational.Table" directorySegmentName="seg_0" id="5F0A8AB7-6FE1-6568-7C1B-FDECD7D256AA" name="admins">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>D7AB17CB-21EE-A574-B7AA-D345278D7D57</importedID>
+<allowColumnReorder>false</allowColumnReorder>
+<existDependencyGenerateInDDl>true</existDependencyGenerateInDDl>
+<parsed>true</parsed>
+<columns itemClass="oracle.dbtools.crest.model.design.relational.Column">
+<Column name="user_id" id="514D3144-9800-4D5B-FB51-D0AD224FA6D4">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>0DA633E9-46B4-1227-C0F1-E60B80ADFBB5</importedID>
+<use>0</use>
+<logicalDatatype>LOGDT019</logicalDatatype>
+<domain>DC2BE0A1-5D25-8A28-E014-FEB42C80ED7B</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+<associations>
+<colAssociation fkAssociation="FDB5D90A-9B34-9C39-A80F-825B62B25791" referredColumn="85BD2846-8EFE-B9E4-0E97-644A47A50141"/>
+</associations>
+</Column>
+<Column name="admin_code" id="5E47ABAB-4553-E57F-5A3B-9623AD292B42">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>7239B7F1-8827-C9FA-A281-03C1583D7CD5</importedID>
+<nullsAllowed>true</nullsAllowed>
+<use>0</use>
+<logicalDatatype>LOGDT024</logicalDatatype>
+<domain>1829C31E-8ADE-372D-B9F6-60CB15ABEBD0</domain>
+<ownDataTypeParameters>,,</ownDataTypeParameters>
+<autoIncrementCycle>false</autoIncrementCycle>
+</Column>
+</columns>
+<indexes itemClass="oracle.dbtools.crest.model.design.relational.Index">
+<ind_PK_UK id="A7D401D4-183B-6CA5-F025-5AA4E77520F8" name="admins_PK">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>13D4FC36-1AAF-C9B2-0DFA-8673DF1E5834</importedID>
+<pk>true</pk>
+<indexState>Primary Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="514D3144-9800-4D5B-FB51-D0AD224FA6D4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="79CA8A9A-4F17-4DDA-FA26-D76ED2844B59" name="INDEX_1">
+<sourceDDLFile>mr.sql</sourceDDLFile>
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<importedID>6ED2A137-2E4F-5B8F-E737-0879224E65D8</importedID>
+<indexState>Unique Constraint</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="5E47ABAB-4553-E57F-5A3B-9623AD292B42"/>
+</indexColumnUsage>
+</ind_PK_UK>
+<ind_PK_UK id="F5A01D36-B79A-F724-5C5E-BAEE3FB20F58" name="admins_users_FK">
+<createdBy>jcard</createdBy>
+<createdTime>2025-09-08 04:42:03 UTC</createdTime>
+<ownerDesignName>PI</ownerDesignName>
+<indexState>Foreign Key</indexState>
+<isSurrogateKey>false</isSurrogateKey>
+<indexColumnUsage>
+<colUsage columnID="514D3144-9800-4D5B-FB51-D0AD224FA6D4"/>
+</indexColumnUsage>
+</ind_PK_UK>
+</indexes>
+</Table>
