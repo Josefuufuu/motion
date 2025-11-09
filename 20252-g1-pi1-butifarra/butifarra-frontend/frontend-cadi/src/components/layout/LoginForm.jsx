@@ -1,6 +1,4 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
-
 import AnimatedContainer from "../ui/AnimatedContainer.jsx";
 
 export default function LoginForm({
@@ -84,17 +82,6 @@ export default function LoginForm({
             </button>
           </div>
 
-          <div className="pt-6 text-center">
-            <span className="text-sm text-gray-600">
-              ¿Aún no tienes una cuenta?
-            </span>
-            <Link
-              to="/register"
-              className="ml-2 text-sm font-semibold text-indigo-600 underline-offset-4 hover:underline"
-            >
-              Regístrate aquí
-            </Link>
-          </div>
         </form>
       </AnimatedContainer>
     </div>
