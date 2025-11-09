@@ -1,4 +1,5 @@
 import json
+import secrets
 
 from django import forms
 from django.http import HttpResponse, JsonResponse
@@ -19,6 +20,7 @@ from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField
 from rest_framework import viewsets, filters, permissions
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
+from rest_framework.reverse import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
 
@@ -27,6 +29,8 @@ from .serializers import ActivitySerializer, TournamentSerializer, ActivityEnrol
 
 # Set up logging
 logger = logging.getLogger(__name__)
+
+CHECKIN_TOKEN_TTL_MINUTES = 10
 
 def index(request):
     return HttpResponse("Bienvenidos al Centro Artístico y Deportivo")
@@ -495,6 +499,89 @@ class ActivityViewSet(viewsets.ModelViewSet):
         qs = activity.enrollments.select_related('user', 'user__profile').order_by('-enrolled_at')
         data = ActivityEnrollmentSerializer(qs, many=True).data
         return Response(data)
+
+    @action(
+        detail=True,
+        methods=['post'],
+        url_path='generate-checkin',
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def generate_checkin(self, request, pk=None):
+        activity = self.get_object()
+        user = request.user
+        profile = getattr(user, 'profile', None)
+        if not profile or not profile.is_professor or activity.assigned_professor_id != user.id:
+            return Response({'detail': 'Solo el profesor asignado puede generar el check-in'}, status=403)
+
+        token = secrets.token_urlsafe(20)
+        expires_at = timezone.now() + timedelta(minutes=CHECKIN_TOKEN_TTL_MINUTES)
+        activity.checkin_token = token
+        activity.checkin_expires_at = expires_at
+        activity.save(update_fields=['checkin_token', 'checkin_expires_at'])
+
+        checkin_base_url = request.build_absolute_uri(
+            reverse('activity-checkin')
+        )
+        checkin_url = f"{checkin_base_url}?token={token}"
+        return Response(
+            {
+                'token': token,
+                'expires_at': expires_at,
+                'checkin_url': checkin_url,
+            }
+        )
+
+    @action(
+        detail=False,
+        methods=['post'],
+        url_path='checkin',
+        permission_classes=[permissions.IsAuthenticated],
+    )
+    def checkin(self, request):
+        token = request.data.get('token')
+        if not token:
+            return Response({'detail': 'Token requerido'}, status=400)
+
+        try:
+            activity = Activity.objects.get(checkin_token=token)
+        except Activity.DoesNotExist:
+            return Response({'detail': 'Token inválido'}, status=404)
+
+        if not activity.checkin_expires_at or activity.checkin_expires_at < timezone.now():
+            return Response({'detail': 'Token expirado'}, status=400)
+
+        enrollment, _ = ActivityEnrollment.objects.get_or_create(
+            user=request.user,
+            activity=activity,
+        )
+
+        attended_before = enrollment.attended
+        if not enrollment.attended:
+            enrollment.attended = True
+            enrollment.save(update_fields=['attended'])
+
+        updates = []
+        if not attended_before:
+            activity.actual_attendees = activity.enrollments.filter(attended=True).count()
+            updates.append('actual_attendees')
+            if activity.capacity:
+                activity.available_spots = max(activity.capacity - activity.actual_attendees, 0)
+                updates.append('available_spots')
+            if updates:
+                activity.save(update_fields=updates)
+        else:
+            activity.refresh_from_db(fields=['actual_attendees', 'available_spots'])
+
+        return Response(
+            {
+                'detail': 'Check-in registrado',
+                'activity_id': activity.id,
+                'attended': True,
+                'already_marked': attended_before,
+                'actual_attendees': activity.actual_attendees,
+                'available_spots': activity.available_spots,
+            }
+        )
 
     @action(detail=True, methods=['post'], url_path='enroll')
     def enroll(self, request, pk=None):
