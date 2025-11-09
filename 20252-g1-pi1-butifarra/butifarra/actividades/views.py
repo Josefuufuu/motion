@@ -12,8 +12,12 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 import logging
+from datetime import timedelta
+
+from django.utils import timezone
+from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField
 from rest_framework import viewsets, filters, permissions
-from rest_framework.decorators import action
+from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
@@ -126,6 +130,32 @@ def _resolve_username(identifier):
         return None
 
     return user.get_username()
+
+
+def _percentage_change(current, previous):
+    """Return the percentage change between two values or None when undefined."""
+    if previous in (None, 0):
+        return None
+    try:
+        return ((current - previous) / previous) * 100.0
+    except (TypeError, ZeroDivisionError):
+        return None
+
+
+def _average_occupancy(queryset):
+    """Calculate the average occupancy (0-1) for the given queryset of activities."""
+    if queryset is None:
+        return None
+
+    result = queryset.aggregate(
+        occupancy=Avg(
+            ExpressionWrapper(
+                F("actual_attendees") * 1.0 / F("capacity"),
+                output_field=FloatField(),
+            )
+        )
+    )
+    return result.get("occupancy")
 
 
 class UserProfileRegistrationForm(UserCreationForm):
@@ -572,3 +602,196 @@ def api_professors(request):
         for u in qs
     ]
     return JsonResponse(data, safe=False, status=200)
+
+
+@api_view(["GET"])
+def api_reports_dashboard(request):
+    user = request.user
+    if not user.is_authenticated:
+        return Response({"detail": "Authentication credentials were not provided."}, status=401)
+
+    profile = getattr(user, "profile", None)
+    has_admin_perms = any(
+        [
+            user.is_staff,
+            user.is_superuser,
+            bool(profile and getattr(profile, "is_admin", False)),
+        ]
+    )
+    if not has_admin_perms:
+        return Response({"detail": "No autorizado"}, status=403)
+
+    now = timezone.now()
+    start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
+    end_of_day = start_of_day + timedelta(days=1)
+
+    todays_attendance = ActivityEnrollment.objects.filter(
+        attended=True,
+        activity__start__gte=start_of_day,
+        activity__start__lt=end_of_day,
+    ).count()
+    yesterdays_attendance = ActivityEnrollment.objects.filter(
+        attended=True,
+        activity__start__gte=start_of_day - timedelta(days=1),
+        activity__start__lt=start_of_day,
+    ).count()
+
+    open_enrollments = Activity.objects.filter(
+        status="active",
+        start__gte=now,
+        available_spots__gt=0,
+    ).count()
+    open_enrollments_previous = Activity.objects.filter(
+        status="active",
+        start__gte=now - timedelta(days=14),
+        start__lt=now - timedelta(days=7),
+        available_spots__gt=0,
+    ).count()
+
+    week_start = (now - timedelta(days=now.weekday())).replace(hour=0, minute=0, second=0, microsecond=0)
+    week_end = week_start + timedelta(days=7)
+    previous_week_start = week_start - timedelta(days=7)
+
+    occupancy_current = _average_occupancy(
+        Activity.objects.filter(
+            start__gte=week_start,
+            start__lt=week_end,
+            capacity__gt=0,
+        )
+    )
+    occupancy_previous = _average_occupancy(
+        Activity.objects.filter(
+            start__gte=previous_week_start,
+            start__lt=week_start,
+            capacity__gt=0,
+        )
+    )
+
+    incidents_current = Activity.objects.filter(
+        status="cancelled",
+        updated_at__gte=now - timedelta(days=7),
+    ).count()
+    incidents_previous = Activity.objects.filter(
+        status="cancelled",
+        updated_at__gte=now - timedelta(days=14),
+        updated_at__lt=now - timedelta(days=7),
+    ).count()
+
+    weekly_attendance_current = ActivityEnrollment.objects.filter(
+        attended=True,
+        activity__start__gte=week_start,
+        activity__start__lt=week_end,
+    ).count()
+    weekly_attendance_previous = ActivityEnrollment.objects.filter(
+        attended=True,
+        activity__start__gte=previous_week_start,
+        activity__start__lt=week_start,
+    ).count()
+
+    weekly_new_users_current = User.objects.filter(
+        date_joined__gte=week_start,
+        date_joined__lt=week_end,
+    ).count()
+    weekly_new_users_previous = User.objects.filter(
+        date_joined__gte=previous_week_start,
+        date_joined__lt=week_start,
+    ).count()
+
+    weekly_activities_created_current = Activity.objects.filter(
+        created_at__gte=week_start,
+        created_at__lt=week_end,
+    ).count()
+    weekly_activities_created_previous = Activity.objects.filter(
+        created_at__gte=previous_week_start,
+        created_at__lt=week_start,
+    ).count()
+
+    summary_cards = [
+        {
+            "key": "attendance_today",
+            "label": "Asistencia hoy",
+            "value": todays_attendance,
+            "change": _percentage_change(todays_attendance, yesterdays_attendance),
+            "format": "number",
+        },
+        {
+            "key": "open_enrollments",
+            "label": "Inscripciones abiertas",
+            "value": open_enrollments,
+            "change": _percentage_change(open_enrollments, open_enrollments_previous),
+            "format": "number",
+        },
+        {
+            "key": "occupancy_rate",
+            "label": "Ocupación promedio",
+            "value": (occupancy_current * 100) if occupancy_current is not None else None,
+            "change": _percentage_change(occupancy_current or 0, occupancy_previous or 0),
+            "format": "percentage",
+        },
+        {
+            "key": "weekly_incidents",
+            "label": "Incidencias (7 días)",
+            "value": incidents_current,
+            "change": _percentage_change(incidents_current, incidents_previous),
+            "format": "number",
+        },
+    ]
+
+    weekly_metrics = [
+        {
+            "key": "weekly_attendance",
+            "label": "Asistencias registradas",
+            "current": weekly_attendance_current,
+            "previous": weekly_attendance_previous,
+            "change": _percentage_change(weekly_attendance_current, weekly_attendance_previous),
+        },
+        {
+            "key": "weekly_new_users",
+            "label": "Nuevos usuarios",
+            "current": weekly_new_users_current,
+            "previous": weekly_new_users_previous,
+            "change": _percentage_change(weekly_new_users_current, weekly_new_users_previous),
+        },
+        {
+            "key": "weekly_created_activities",
+            "label": "Actividades creadas",
+            "current": weekly_activities_created_current,
+            "previous": weekly_activities_created_previous,
+            "change": _percentage_change(
+                weekly_activities_created_current,
+                weekly_activities_created_previous,
+            ),
+        },
+    ]
+
+    recent_qs = (
+        Activity.objects.annotate(total_enrollments=Count("enrollments"))
+        .order_by("-start", "-created_at")
+        [:5]
+    )
+    recent_activities = [
+        {
+            "id": activity.id,
+            "title": activity.title,
+            "category": activity.get_category_display(),
+            "status": activity.status,
+            "start": activity.start.isoformat() if activity.start else None,
+            "end": activity.end.isoformat() if activity.end else None,
+            "created_at": activity.created_at.isoformat() if activity.created_at else None,
+            "updated_at": activity.updated_at.isoformat() if activity.updated_at else None,
+            "capacity": activity.capacity,
+            "available_spots": activity.available_spots,
+            "actual_attendees": activity.actual_attendees,
+            "enrollments": activity.total_enrollments,
+        }
+        for activity in recent_qs
+    ]
+
+    payload = {
+        "summary_cards": summary_cards,
+        "weekly_metrics": weekly_metrics,
+        "recent_activities": recent_activities,
+        "generated_at": now.isoformat(),
+    }
+
+    return Response(payload, status=200)
