@@ -26,6 +26,7 @@ import ActivityListPage from "./pages/ActivityListPage.jsx";
 import ActivityDetailPage from "./pages/ActivityDetailPage.jsx";
 import AdminTorneosPage from "./pages/AdminTorneosPage.jsx";
 import ProfessorHomePage from "./pages/ProfessorHomePage.jsx";
+import CheckinPage from "./pages/CheckinPage.jsx";
 
 // --- COMPONENTE DE ERROR 404 ---
 function NotFound() {
@@ -302,6 +303,7 @@ export default function App() {
 
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
+        <Route path="/checkin/:token" element={<CheckinPage />} />
         <Route path="*" element={<NotFound />} />
 
       </Routes>

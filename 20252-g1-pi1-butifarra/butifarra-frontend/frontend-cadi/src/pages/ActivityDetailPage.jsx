@@ -5,6 +5,7 @@ import { useActividades } from '../hooks/useActividades.js';
 import { formatDate } from '../utils.js';
 import { Calendar as CalendarIcon, MapPin, Clock, Users, Tag as TagIcon, Eye } from 'lucide-react';
 import { useAuth } from '../context/AuthContext.jsx';
+import { QRCodeSVG } from 'qrcode.react';
 
 const CATEGORY_LABELS = {
   DEPORTE: 'Deporte',
@@ -16,7 +17,15 @@ const CATEGORY_LABELS = {
 
 export default function ActivityDetailPage() {
   const { id } = useParams();
-  const { getActividad, loading, error, getEnrollments, setAttendance, saveProfessorNotes, enrollInActivity, unenrollFromActivity } = useActividades();
+  const {
+    getActividad,
+    loading,
+    error,
+    getEnrollments,
+    setAttendance,
+    saveProfessorNotes,
+    generateCheckin,
+  } = useActividades();
   const { user, isProfessor } = useAuth();
   const [activity, setActivity] = useState(null);
   const [notFound, setNotFound] = useState(false);
@@ -24,6 +33,8 @@ export default function ActivityDetailPage() {
   const [attendedIds, setAttendedIds] = useState(new Set());
   const [notes, setNotes] = useState('');
   const [busy, setBusy] = useState(false);
+  const [checkinInfo, setCheckinInfo] = useState(null);
+  const [generatingQr, setGeneratingQr] = useState(false);
 
   const isAssignedProfessor = useMemo(() => {
     if (!activity || !user) return false;
@@ -48,6 +59,21 @@ export default function ActivityDetailPage() {
   }, [id, getActividad]);
 
   useEffect(() => {
+    if (!isAssignedProfessor || !activity?.id) return undefined;
+    let cancelled = false;
+    const interval = setInterval(async () => {
+      const updated = await getActividad(activity.id);
+      if (!cancelled && updated) {
+        setActivity(prev => ({ ...(prev ?? {}), ...updated }));
+      }
+    }, 10000);
+    return () => {
+      cancelled = true;
+      clearInterval(interval);
+    };
+  }, [isAssignedProfessor, activity?.id, getActividad]);
+
+  useEffect(() => {
     let isMounted = true;
     (async () => {
       if (!isAssignedProfessor) return;
@@ -59,6 +85,24 @@ export default function ActivityDetailPage() {
     })();
     return () => { isMounted = false; };
   }, [id, isAssignedProfessor, getEnrollments]);
+
+  useEffect(() => {
+    if (!activity?.checkin_token) {
+      setCheckinInfo(null);
+      return;
+    }
+    setCheckinInfo(prev => {
+      if (prev && prev.token === activity.checkin_token) {
+        return { ...prev, expires_at: activity.checkin_expires_at };
+      }
+      const origin = typeof window !== 'undefined' ? window.location.origin : '';
+      return {
+        token: activity.checkin_token,
+        expires_at: activity.checkin_expires_at,
+        frontendUrl: origin ? `${origin}/checkin/${activity.checkin_token}` : `/checkin/${activity.checkin_token}`,
+      };
+    });
+  }, [activity?.checkin_token, activity?.checkin_expires_at]);
 
   const toggleAttendance = (uid) => {
     setAttendedIds(prev => {
@@ -91,22 +135,20 @@ export default function ActivityDetailPage() {
     } finally { setBusy(false); }
   };
 
-  const handleEnroll = async () => {
+  const handleGenerateQr = async () => {
     if (!activity) return;
-    setBusy(true);
+    setGeneratingQr(true);
     try {
-      await enrollInActivity(activity.id);
-      // optimistically reduce available spots
-      setActivity(a => a ? { ...a, available_spots: Math.max((a.available_spots ?? 0) - 1, 0) } : a);
-    } finally { setBusy(false); }
-  };
-  const handleUnenroll = async () => {
-    if (!activity) return;
-    setBusy(true);
-    try {
-      await unenrollFromActivity(activity.id);
-      setActivity(a => a ? { ...a, available_spots: (a.available_spots ?? 0) + 1 } : a);
-    } finally { setBusy(false); }
+      const data = await generateCheckin(activity.id);
+      if (data) {
+        const origin = typeof window !== 'undefined' ? window.location.origin : '';
+        const frontendUrl = origin ? `${origin}/checkin/${data.token}` : `/checkin/${data.token}`;
+        setCheckinInfo({ ...data, frontendUrl });
+        setActivity(a => (a ? { ...a, checkin_token: data.token, checkin_expires_at: data.expires_at } : a));
+      }
+    } finally {
+      setGeneratingQr(false);
+    }
   };
 
   const Header = () => (
@@ -220,6 +262,39 @@ export default function ActivityDetailPage() {
     return (
       <section className="space-y-6">
         <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <div className="flex flex-col gap-4 md:flex-row md:items-start md:justify-between">
+            <div className="flex-1 space-y-2">
+              <h3 className="text-sm font-semibold text-slate-700">Control de asistencias</h3>
+              <p className="text-sm text-slate-500">Comparte este código con tus estudiantes para que registren su asistencia.</p>
+              <button
+                onClick={handleGenerateQr}
+                disabled={generatingQr}
+                className="inline-flex items-center justify-center rounded-md bg-indigo-600 px-3 py-2 text-sm font-medium text-white hover:bg-indigo-700 disabled:opacity-50"
+              >
+                {generatingQr ? 'Generando...' : 'Generar QR'}
+              </button>
+              <p className="text-sm text-slate-600">
+                Asistentes registrados: <span className="font-semibold">{activity?.actual_attendees ?? 0}</span>
+              </p>
+              {checkinInfo?.expires_at && (
+                <p className="text-xs text-slate-500">Vence: {new Date(checkinInfo.expires_at).toLocaleString()}</p>
+              )}
+              {checkinInfo?.frontendUrl && (
+                <p className="break-all text-xs text-slate-500">Enlace directo: {checkinInfo.frontendUrl}</p>
+              )}
+            </div>
+            <div className="flex justify-center">
+              {checkinInfo?.frontendUrl ? (
+                <QRCodeSVG value={checkinInfo.frontendUrl} size={200} className="h-48 w-48" />
+              ) : (
+                <div className="flex h-48 w-48 items-center justify-center rounded-xl border border-dashed border-slate-300 text-center text-sm text-slate-400">
+                  Genera un código para mostrarlo aquí
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
           <h3 className="mb-3 text-sm font-semibold text-slate-700">Asistentes ({activity?.actual_attendees ?? 0})</h3>
           {enrollments.length === 0 ? (
             <p className="text-sm text-slate-500">No hay inscritos aún.</p>
@@ -271,11 +346,9 @@ export default function ActivityDetailPage() {
     return (
       <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
         <h3 className="mb-3 text-sm font-semibold text-slate-700">Participación</h3>
-        <div className="flex gap-2">
-          <button onClick={handleEnroll} disabled={busy || (activity.available_spots ?? 0) <= 0} className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700 disabled:opacity-50">Inscribirme</button>
-          <button onClick={handleUnenroll} disabled={busy} className="rounded-md border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-50">Cancelar inscripción</button>
-          <span className="text-sm text-slate-500 self-center">Cupos disponibles: {activity.available_spots ?? 0}</span>
-        </div>
+        <p className="text-sm text-slate-500">
+          No es necesario inscribirse previamente. Escanea el código QR proporcionado por el profesor al inicio de la actividad para registrar tu asistencia.
+        </p>
       </div>
     );
   };

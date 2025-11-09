@@ -263,6 +263,47 @@ export const useActividades = () => {
     finally { setLoading(false); }
   }, []);
 
+  const generateCheckin = useCallback(async (id) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const resp = await apiFetch(`/api/actividades/${id}/generate-checkin/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+      });
+      showToast('QR generado correctamente', 'success');
+      return resp;
+    } catch (err) {
+      setError(err.message);
+      showToast(`No se pudo generar el QR: ${err.message}`, 'error');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  const checkinActivity = useCallback(async (token) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const resp = await apiFetch('/api/actividades/checkin/', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify({ token }),
+      });
+      showToast('Asistencia registrada', 'success');
+      return resp;
+    } catch (err) {
+      setError(err.message);
+      showToast(`No se pudo registrar asistencia: ${err.message}`, 'error');
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
   return {
     actividades,
     loading,
@@ -278,5 +319,7 @@ export const useActividades = () => {
     saveProfessorNotes,
     enrollInActivity,
     unenrollFromActivity,
+    generateCheckin,
+    checkinActivity,
   };
 };
