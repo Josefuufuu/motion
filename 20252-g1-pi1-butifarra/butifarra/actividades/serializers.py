@@ -50,8 +50,9 @@ class ActivitySerializer(serializers.ModelSerializer):
                   'start', 'end', 'capacity', 'available_spots',
                   'instructor', 'assigned_professor', 'assigned_professor_name',
                   'visibility', 'status', 'tags', 'notes', 'actual_attendees',
+                  'checkin_token', 'checkin_expires_at',
                   'created_by', 'created_at', 'updated_at']
-        read_only_fields = ['created_by', 'created_at', 'updated_at', 'assigned_professor_name', 'actual_attendees']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'assigned_professor_name', 'actual_attendees', 'checkin_token', 'checkin_expires_at']
 
     def get_assigned_professor_name(self, obj):
         user = getattr(obj, 'assigned_professor', None)

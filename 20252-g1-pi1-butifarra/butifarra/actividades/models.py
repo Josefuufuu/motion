@@ -114,6 +114,8 @@ class Activity(models.Model):
     updated_at = models.DateTimeField(auto_now=True)
     actual_attendees = models.PositiveIntegerField(default=0)  # Conteo real de asistentes
     notes = models.TextField(blank=True)  # Notas / reporte del profesor
+    checkin_token = models.CharField(max_length=64, null=True, blank=True, unique=True)
+    checkin_expires_at = models.DateTimeField(null=True, blank=True)
 
     class Meta:
         indexes = [
