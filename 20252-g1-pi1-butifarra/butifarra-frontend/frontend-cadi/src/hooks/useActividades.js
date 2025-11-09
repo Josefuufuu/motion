@@ -23,10 +23,7 @@ const apiFetch = async (url, options = {}) => {
       const errorData = await response.json();
       console.error('API error response:', errorData);
       errorMessage = errorData.detail || errorData.error || JSON.stringify(errorData);
-    } catch (e) {
-      // If we can't parse the error, use the status text
-      errorMessage = response.statusText;
-    }
+    } catch {/* ignore parse error */ }
 
     throw new Error(errorMessage);
   }
@@ -42,10 +39,9 @@ export const useActividades = () => {
   const [error, setError] = useState(null);
 
   // List activities with optional filters
-  const listActividades = useCallback(async ({ from, to, category, q } = {}) => {
+  const listActividades = useCallback(async ({ from, to, category, q, mine_prof } = {}) => {
     setLoading(true);
     setError(null);
-
     try {
       // Build query string from filters
       const params = new URLSearchParams();
@@ -53,22 +49,17 @@ export const useActividades = () => {
       if (to) params.append('to', to);
       if (category) params.append('category', category);
       if (q) params.append('q', q);
-
+      if (mine_prof) params.append('mine_prof', '1');
       const queryString = params.toString() ? `?${params.toString()}` : '';
       const url = `/api/actividades/${queryString}`;
-
       const data = await apiFetch(url);
-      console.log('Loaded activities:', data);
       setActividades(data);
       return data;
     } catch (err) {
-      console.error('Error loading activities:', err);
       setError(err.message);
       showToast(`Error al cargar actividades: ${err.message}`, 'error');
       return [];
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
   // Create a new activity
@@ -113,17 +104,13 @@ export const useActividades = () => {
   const getActividad = useCallback(async (id) => {
     setLoading(true);
     setError(null);
-
     try {
-      const data = await apiFetch(`/api/actividades/${id}/`);
-      return data;
+      return await apiFetch(`/api/actividades/${id}/`);
     } catch (err) {
       setError(err.message);
       showToast(`Error al obtener actividad: ${err.message}`, 'error');
       return null;
-    } finally {
-      setLoading(false);
-    }
+    } finally { setLoading(false); }
   }, []);
 
   // Update an existing activity
@@ -158,6 +145,24 @@ export const useActividades = () => {
     }
   }, []);
 
+  // Update an existing activity as professor
+  const updateActividadProfesor = useCallback(async (id, partialData) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const response = await apiFetch(`/api/actividades/${id}/professor-update/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify(partialData)
+      });
+      setActividades(prev => prev.map(a => a.id === id ? response : a));
+      showToast('Actividad actualizada', 'success');
+      return response;
+    } catch (err) { setError(err.message); showToast(`Error: ${err.message}`, 'error'); throw err; }
+    finally { setLoading(false); }
+  }, []);
+
   // Delete an activity
   const deleteActividad = useCallback(async (id) => {
     setLoading(true);
@@ -189,6 +194,75 @@ export const useActividades = () => {
     }
   }, []);
 
+  const getEnrollments = useCallback(async (id) => {
+    setError(null);
+    try {
+      return await apiFetch(`/api/actividades/${id}/enrollments/`);
+    } catch (err) { setError(err.message); showToast(`Error al cargar inscripciones: ${err.message}`, 'error'); return []; }
+  }, []);
+
+  const setAttendance = useCallback(async (id, { attended = [], not_attended = [] } = {}) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const resp = await apiFetch(`/api/actividades/${id}/professor/attendance/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify({ attended, not_attended })
+      });
+      showToast('Asistencias actualizadas', 'success');
+      return resp;
+    } catch (err) { setError(err.message); showToast(`Error al marcar asistencia: ${err.message}`, 'error'); throw err; }
+    finally { setLoading(false); }
+  }, []);
+
+  const saveProfessorNotes = useCallback(async (id, notes) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const resp = await apiFetch(`/api/actividades/${id}/professor/notes/`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+        body: JSON.stringify({ notes })
+      });
+      showToast('Notas guardadas', 'success');
+      return resp;
+    } catch (err) { setError(err.message); showToast(`Error al guardar notas: ${err.message}`, 'error'); throw err; }
+    finally { setLoading(false); }
+  }, []);
+
+  const enrollInActivity = useCallback(async (id) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const resp = await apiFetch(`/api/actividades/${id}/enroll/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+      });
+      showToast('Inscripción exitosa', 'success');
+      return resp;
+    } catch (err) { setError(err.message); showToast(`No se pudo inscribir: ${err.message}`, 'error'); throw err; }
+    finally { setLoading(false); }
+  }, []);
+
+  const unenrollFromActivity = useCallback(async (id) => {
+    setLoading(true); setError(null);
+    try {
+      const csrftoken = getCookie('csrftoken');
+      if (!csrftoken) throw new Error('No CSRF token found.');
+      const resp = await apiFetch(`/api/actividades/${id}/unenroll/`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json', 'X-CSRFToken': csrftoken },
+      });
+      showToast('Inscripción cancelada', 'success');
+      return resp;
+    } catch (err) { setError(err.message); showToast(`No se pudo cancelar: ${err.message}`, 'error'); throw err; }
+    finally { setLoading(false); }
+  }, []);
+
   return {
     actividades,
     loading,
@@ -197,6 +271,12 @@ export const useActividades = () => {
     createActividad,
     getActividad,
     updateActividad,
-    deleteActividad
+    deleteActividad,
+    updateActividadProfesor,
+    getEnrollments,
+    setAttendance,
+    saveProfessorNotes,
+    enrollInActivity,
+    unenrollFromActivity,
   };
 };

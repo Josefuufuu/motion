@@ -25,7 +25,8 @@ export default function LoginPage() {
         loggedUser?.profile?.is_admin ||
         loggedUser?.profile?.role === "ADMIN"
       );
-      navigate(isAdmin ? "/admin/home" : "/inicio", { replace: true });
+      const isProfessor = loggedUser?.profile?.role === 'PROFESSOR';
+      navigate(isAdmin ? '/admin/home' : isProfessor ? '/profesor' : '/inicio', { replace: true });
     } catch (err) {
       const message = err instanceof Error ? err.message : "No se pudo iniciar sesión.";
       setFeedback(message);

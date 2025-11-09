@@ -10,7 +10,8 @@ export const RoleProvider = ({ children }) => {
   useEffect(() => {
     if (!user) { setRole(null); return; }
     const isAdmin = user.is_staff || user.is_superuser || user.profile?.role === 'ADMIN' || user.profile?.is_admin;
-    setRole(isAdmin ? 'Administrador' : 'Estudiante');
+    const isProf = user.profile?.role === 'PROFESSOR';
+    setRole(isAdmin ? 'Administrador' : isProf ? 'Profesor' : 'Estudiante');
   }, [user]);
 
   return (

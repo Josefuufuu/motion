@@ -47,33 +47,33 @@ export default function InscripcionFormCard({ proyecto, onSuccess }) {
 
         <label className="grid gap-1">
           <span className="text-sm font-medium">Nombres y apellidos *</span>
-          <input className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-text"
+          <input className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500"
                  name="nombres" required value={form.nombres} onChange={onChange}/>
         </label>
 
         <label className="grid gap-1">
           <span className="text-sm font-medium">Correo *</span>
-          <input className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-text"
+          <input className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500"
                  type="email" name="correo" required value={form.correo} onChange={onChange}/>
         </label>
 
         <label className="grid gap-1">
           <span className="text-sm font-medium">Teléfono</span>
-          <input className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500 focus:outline-none cursor-text"
+          <input className="px-3 py-2 rounded-xl border border-gray-300 focus:ring-2 focus:ring-indigo-500"
                  name="telefono" value={form.telefono} onChange={onChange}/>
         </label>
 
-        <label className="flex items-start gap-3 text-sm cursor-pointer">
-          <input type="checkbox" className="mt-1 cursor-pointer" checked={acepto} onChange={(e)=>setAcepto(e.target.checked)}/>
+        <label className="flex items-start gap-3 text-sm">
+          <input type="checkbox" className="mt-1" checked={acepto} onChange={(e)=>setAcepto(e.target.checked)}/>
           <span>Acepto el tratamiento de datos personales.</span>
         </label>
 
         <div className="flex items-center gap-3 pt-2">
-          <button disabled={loading} className={`px-4 py-2 rounded-xl text-white font-medium transition-colors ${loading?"bg-indigo-300 cursor-not-allowed":"bg-indigo-600 hover:bg-indigo-700 cursor-pointer"}`}>
+          <button disabled={loading} className={`px-4 py-2 rounded-xl text-white font-medium ${loading?"bg-indigo-300":"bg-indigo-600 hover:bg-indigo-700"}`}>
             {loading ? "Enviando…" : "Inscribirme"}
           </button>
           <button type="button" onClick={()=>{setForm({nombres:"",correo:"",telefono:""});setAcepto(false);setMsg(null);}}
-                  className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50 transition-colors cursor-pointer">
+                  className="px-4 py-2 rounded-xl border border-gray-300 text-gray-700 hover:bg-gray-50">
             Limpiar
           </button>
         </div>

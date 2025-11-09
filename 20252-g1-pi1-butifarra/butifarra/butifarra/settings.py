@@ -155,6 +155,8 @@ CSRF_DEFAULT_TRUSTED_ORIGINS = [
     "http://localhost:5174",
     "http://127.0.0.1:5173",
     "http://127.0.0.1:5174",
+    "http://18.219.237.52:5173",
+    "http://18.219.237.52:8000",
 ]
 EXTRA_CSRF_TRUSTED_ORIGINS = [
     origin.strip()

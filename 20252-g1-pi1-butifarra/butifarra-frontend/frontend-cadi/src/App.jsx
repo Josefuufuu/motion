@@ -1,3 +1,5 @@
+// src/App.jsx
+
 import React from "react";
 import { BrowserRouter, Routes, Route, Navigate, useLocation } from "react-router-dom";
 import PropTypes from "prop-types";
@@ -23,13 +25,14 @@ import PersonalCalendar from "./pages/PersonalCalendar.jsx";
 import ActivityListPage from "./pages/ActivityListPage.jsx";
 import ActivityDetailPage from "./pages/ActivityDetailPage.jsx";
 import AdminTorneosPage from "./pages/AdminTorneosPage.jsx";
+import ProfessorHomePage from "./pages/ProfessorHomePage.jsx";
 
 // --- COMPONENTE DE ERROR 404 ---
 function NotFound() {
   return (
     <div style={{ padding: 24 }}>
       <h1>404</h1>
-      <p>Página no encontrada.</p>
+      <p>Ruta no encontrada.</p>
     </div>
   );
 }
@@ -284,6 +287,10 @@ export default function App() {
             </AdminRoute>
           )}
         />
+
+        {/* Rutas de profesor */}
+        <Route path="/profesor" element={(<ProfessorHomePage />)} />
+        <Route path="/profesor/actividades" element={(<ProfessorHomePage />)} />
 
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />

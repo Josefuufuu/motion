@@ -1,7 +1,6 @@
-// src/components/Sidebar/RouteSelect.jsx
 import React, { useMemo } from "react";
 import { Link, useLocation } from "react-router-dom";
-import { useRole } from "./RoleContext";
+import { useAuth } from "../../context/AuthContext";
 
 import homeIcon from "../../assets/icons/home-icon.png";
 import dashboardIcon from "../../assets/icons/dashboard-icon.png";
@@ -12,97 +11,47 @@ import trophyIcon from "../../assets/icons/trophy-icon.png";
 import brainIcon from "../../assets/icons/brain-icon.png";
 import calendarIcon from "../../assets/icons/dashboard-icon.png";
 
-const routes = [
-  {
-    key: "home",
-    path: "/admin/home",
-    pathByRole: {
-      Estudiante: "/inicio",
-    },
-    icon: homeIcon,
-    title: "Inicio",
-    roles: ["Estudiante", "Administrador", "Colaborador"],
-  },
-  {
-    key: "gestion",
-    path: "/gestion-cadi",
-    icon: dashboardIcon,
-    title: "Gestión CADI",
-    roles: ["Administrador"],
-  },
-  {
-    key: "torneos",
-    path: "/admin/torneos", 
-    pathByRole: {
-      Estudiante: "/torneos", 
-    },
-    icon: trophyIcon,
-    title: "Torneos",
-    roles: ["Estudiante", "Colaborador", "Administrador"],
-  },
-  {
-    key: "psu",
-    path: "/psu",
-    icon: groupsIcon,
-    title: "PSU/Voluntariados",
-    roles: ["Estudiante", "Colaborador", "Administrador"],
-  },
-  {
-    key: "citas",
-    path: "/citas",
-    icon: brainIcon,
-    title: "Citas psicológicas",
-    roles: ["Estudiante"],
-  },
-  {
-    key: "reportes",
-    path: "/estadisticas", 
-    icon: reportIcon,
-    title: "Analítica y Reportes",
-    roles: ["Administrador", "Colaborador"],
-  },
-  {
-    key: "notificaciones",
-    path: "/notificaciones",
-    icon: notificationIcon,
-    title: "Notificaciones",
-    roles: ["Estudiante", "Administrador", "Colaborador"],
-  },
-  {
-    key: "calendario",
-    path: "/calendario",
-    icon: calendarIcon,
-    title: "Calendario",
-    roles: ["Estudiante", "Administrador", "Colaborador"],
-  },
+// Rutas para beneficiarios/estudiantes
+const beneficiaryRoutes = [
+  { key: "home", path: "/inicio", icon: homeIcon, title: "Inicio" },
+  { key: "calendario", path: "/calendario", icon: calendarIcon, title: "Calendario" },
+  { key: "torneos", path: "/torneos", icon: trophyIcon, title: "Torneos" },
+  { key: "psu", path: "/psu", icon: groupsIcon, title: "PSU/Voluntariados" },
+  { key: "citas", path: "/citas", icon: brainIcon, title: "Citas psicológicas" },
+];
+
+// Rutas para administradores
+const adminRoutes = [
+  { key: "home", path: "/admin/home", icon: homeIcon, title: "Inicio Admin" },
+  { key: "gestion", path: "/gestion-cadi", icon: dashboardIcon, title: "Gestión CADI" },
+  { key: "calendario", path: "/calendario", icon: calendarIcon, title: "Calendario" },
+  { key: "torneos", path: "/admin/torneos", icon: trophyIcon, title: "Gestión Torneos" },
+  { key: "reportes", path: "/admin/reports", icon: reportIcon, title: "Reportes" },
+  { key: "notificaciones", path: "/notificaciones", icon: notificationIcon, title: "Notificaciones" },
+];
+
+// Rutas para profesores
+const professorRoutes = [
+  { key: "home", path: "/profesor", icon: homeIcon, title: "Inicio Profesor" },
+  { key: "mis-actividades", path: "/profesor/actividades", icon: dashboardIcon, title: "Mis actividades" },
+  { key: "calendario", path: "/calendario", icon: calendarIcon, title: "Calendario" },
 ];
 
 export const RouteSelect = () => {
-  const role = useRole();
+  const { isAdmin, isBeneficiary, isProfessor } = useAuth();
   const location = useLocation();
 
   const resolvedRoutes = useMemo(() => {
-    if (!role) return [];
-    return routes
-      .filter((route) => route.roles.includes(role))
-      .map((route) => ({
-        ...route,
-        path: route.pathByRole?.[role] ?? route.path,
-      }));
-  }, [role]);
-
-  if (!role) return null;
+    if (isAdmin()) return adminRoutes;
+    if (isProfessor && isProfessor()) return professorRoutes;
+    if (isBeneficiary()) return beneficiaryRoutes;
+    return [];
+  }, [isAdmin, isBeneficiary, isProfessor]);
 
   return (
     <div className="space-y-1">
       {resolvedRoutes.map((route) => (
-        <SidebarRoute
-          key={route.key}
-          icon={route.icon}
-          title={route.title}
-          path={route.path}
-          selected={location.pathname.startsWith(route.path)}
-        />
+        <SidebarRoute key={route.key} icon={route.icon} title={route.title} path={route.path} selected={location.pathname === route.path || location.pathname.startsWith(route.path + '/')} />
       ))}
     </div>
   );

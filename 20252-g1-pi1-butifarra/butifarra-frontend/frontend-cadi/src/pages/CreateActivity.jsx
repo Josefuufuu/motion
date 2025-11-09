@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import AppLayout from '../components/layout/AppLayout.jsx';
 import { useActividades } from '../hooks/useActividades.js';
 import { combineDateTime } from '../utils.js';
@@ -17,7 +17,25 @@ export default function CreateActivity() {
   const [formData, setFormData] = useState(initialFormState);
   const [imagePreview, setImagePreview] = useState(null);
   const [formErrors, setFormErrors] = useState({});
+  const [professors, setProfessors] = useState([]);
+  const [loadingProfessors, setLoadingProfessors] = useState(false);
   const formRef = useRef(null);
+
+  useEffect(() => {
+    const loadProfessors = async () => {
+      setLoadingProfessors(true);
+      try {
+        const resp = await fetch('/api/professors/', { credentials: 'include' });
+        if (resp.ok) {
+          const data = await resp.json();
+          setProfessors(data);
+        }
+      } catch (err) {
+        console.error('No se pudieron cargar profesores', err);
+      } finally { setLoadingProfessors(false); }
+    };
+    loadProfessors();
+  }, []);
 
   const handleInputChange = (e) => {
     const { name, value } = e.target;
@@ -96,7 +114,8 @@ export default function CreateActivity() {
         instructor: formData.instructor,
         visibility: formData.visibility || 'public',
         status: formData.status || 'active',
-        tags: tagsArray
+        tags: tagsArray,
+        assigned_professor: formData.assigned_professor || null,
       };
       console.log('Submitting activity data:', activityData);
 
@@ -263,6 +282,22 @@ export default function CreateActivity() {
                     >
                       <option value="public">Pública</option>
                       <option value="private">Privada</option>
+                    </select>
+                  </div>
+
+                  <div className="form-field">
+                    <label htmlFor="profesor">Profesor asignado (opcional)</label>
+                    <select
+                      id="profesor"
+                      name="assigned_professor"
+                      value={formData.assigned_professor || ''}
+                      onChange={(e) => setFormData(prev => ({ ...prev, assigned_professor: e.target.value }))}
+                    >
+                      <option value="">-- Sin asignar --</option>
+                      {loadingProfessors && <option>Cargando...</option>}
+                      {!loadingProfessors && professors.map(p => (
+                        <option key={p.id} value={p.id}>{p.full_name}</option>
+                      ))}
                     </select>
                   </div>
 

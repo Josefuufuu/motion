@@ -36,7 +36,7 @@ export default function LoginForm({
               onChange={(e) => setEmail(e.target.value)}
               autoComplete="username"
               placeholder="Correo institucional"
-              className="w-full rounded-xl border border-gray-300/90 px-4 py-3 text-gray-900 outline-none ring-0 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none cursor-text"
+              className="w-full rounded-xl border border-gray-300/90 px-4 py-3 text-gray-900 outline-none ring-0 placeholder:text-gray-400 focus:border-indigo-500 focus:outline-none"
             />
           </div>
 
@@ -48,7 +48,7 @@ export default function LoginForm({
               onChange={(e) => setPassword(e.target.value)}
               autoComplete="current-password"
               placeholder="Contraseña"
-              className="w-full rounded-xl border border-gray-300/90 px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-indigo-500 cursor-text"
+              className="w-full rounded-xl border border-gray-300/90 px-4 py-3 text-gray-900 outline-none placeholder:text-gray-400 focus:border-indigo-500"
             />
           </div>
 
@@ -78,7 +78,7 @@ export default function LoginForm({
           <div className="pt-6">
             <button
               type="submit"
-              className="h-[56px] w-[200px] rounded-xl bg-indigo-600 text-white transition-base hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500 cursor-pointer"
+              className="h-[56px] w-[200px] rounded-xl bg-indigo-600 text-white transition-base hover:bg-indigo-700 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-indigo-500"
             >
               Ingresar
             </button>

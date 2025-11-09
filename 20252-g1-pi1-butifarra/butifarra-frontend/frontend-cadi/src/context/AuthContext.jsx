@@ -194,6 +194,11 @@ export function AuthProvider({ children }) {
     );
   }, [user]);
 
+  const isProfessor = useCallback(() => {
+    if (!user) return false;
+    return user.profile?.role === 'PROFESSOR';
+  }, [user]);
+
   const value = useMemo(() => ({
     user,
     loading,
@@ -203,7 +208,8 @@ export function AuthProvider({ children }) {
     restoreSession,
     isAdmin,
     isBeneficiary,
-  }), [user, loading, error, login, logout, restoreSession, isAdmin, isBeneficiary]);
+    isProfessor,
+  }), [user, loading, error, login, logout, restoreSession, isAdmin, isBeneficiary, isProfessor]);
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
 }

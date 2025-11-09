@@ -22,7 +22,7 @@ export const Logout = () => {
       <button
         type="button"
         onClick={handleLogout}
-        className="flex w-full items-center gap-2 rounded px-4 py-2 text-left text-red-600 transition-colors hover:bg-red-100 cursor-pointer"
+        className="flex w-full items-center gap-2 rounded px-4 py-2 text-left text-red-600 transition-colors hover:bg-red-100"
       >
         <img src={logoutIcon} alt="" className="h-5 w-5" aria-hidden="true" />
         <span className="text-base font-medium">Cerrar sesión</span>

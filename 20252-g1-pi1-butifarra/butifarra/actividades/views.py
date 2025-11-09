@@ -7,19 +7,21 @@ from django.views.decorators.csrf import csrf_exempt
 from django.contrib.auth import authenticate, get_user_model, login, logout
 from django.contrib.auth.forms import AuthenticationForm, UserCreationForm
 from django.contrib.auth.decorators import login_required
-from django.views.decorators.http import require_http_methods
+from django.views.decorators.http import require_http_methods, require_GET
 from django.contrib.auth.models import User
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
-from django.db import models
 import logging
 from rest_framework import viewsets, filters, permissions
 from rest_framework.decorators import action
+from rest_framework.response import Response
 from django_filters.rest_framework import DjangoFilterBackend
+from django.db.models import Q
 
-from .models import Activity, UserProfile, Project, Enrollment
-from .serializers import ActivitySerializer, ProjectSerializer, EnrollmentSerializer
+from .models import Activity, UserProfile, Tournament, ActivityEnrollment
+from .serializers import ActivitySerializer, TournamentSerializer, ActivityEnrollmentSerializer
 
+# Set up logging
 logger = logging.getLogger(__name__)
 
 def index(request):
@@ -181,11 +183,12 @@ class UserProfileRegistrationForm(UserCreationForm):
 
         if commit:
             user.save()
-            profile, _ = UserProfile.objects.get_or_create(user=user)
-            profile.phone_number = self.cleaned_data["phone_number"]
-            profile.program = self.cleaned_data["program"]
-            profile.semester = self.cleaned_data["semester"]
-            profile.save()
+            UserProfile.objects.create(
+                user=user,
+                phone_number=self.cleaned_data["phone_number"],
+                program=self.cleaned_data["program"],
+                semester=self.cleaned_data["semester"],
+            )
 
         return user
 
@@ -318,25 +321,37 @@ class IsAdminOrReadOnly(permissions.BasePermission):
     Custom permission to allow:
     - Read-only access to all authenticated users
     - Write access only to admin users (staff, superuser, or ADMIN role)
+    - Professors can update activities assigned to them (limited fields)
     """
     def has_permission(self, request, view):
-        # Allow read operations for authenticated users
         if request.method in permissions.SAFE_METHODS:
             return request.user and request.user.is_authenticated
-
-        # Check if user is admin for write operations
         if not request.user or not request.user.is_authenticated:
             return False
-
-        # Check if user is staff, superuser, or has ADMIN role
+        # Admin full access
         if request.user.is_staff or request.user.is_superuser:
             return True
-
-        # Check user profile for ADMIN role
         profile = getattr(request.user, 'profile', None)
         if profile and profile.is_admin:
             return True
+        # Professors allowed partial update via custom action (handled in has_object_permission)
+        if profile and profile.is_professor and view.action in ['partial_update', 'professor_update']:
+            return True
+        return False
 
+    def has_object_permission(self, request, view, obj):
+        # Read permissions allowed already
+        if request.method in permissions.SAFE_METHODS:
+            return True
+        # Admin full access
+        if request.user.is_staff or request.user.is_superuser:
+            return True
+        profile = getattr(request.user, 'profile', None)
+        if profile and profile.is_admin:
+            return True
+        # Professor can modify only if assigned to them and only via partial update
+        if profile and profile.is_professor and obj.assigned_professor_id == request.user.id and view.action in ['partial_update', 'professor_update']:
+            return True
         return False
 
 
@@ -351,20 +366,20 @@ class ActivityViewSet(viewsets.ModelViewSet):
     serializer_class = ActivitySerializer
     permission_classes = [IsAdminOrReadOnly]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['category', 'status', 'visibility']
+    filterset_fields = ['category', 'status', 'visibility', 'assigned_professor']
     search_fields = ['title', 'description', 'location', 'instructor']
 
     def get_queryset(self):
-        """
-        Filter queryset based on query parameters
-        """
         queryset = Activity.objects.all().order_by('-start')
+        request = self.request
 
-        # Filter by date range
-        from_date = self.request.query_params.get('from', None)
-        to_date = self.request.query_params.get('to', None)
-        category = self.request.query_params.get('category', None)
-        q = self.request.query_params.get('q', None)
+        # Optional filters
+        from_date = request.query_params.get('from')
+        to_date = request.query_params.get('to')
+        category = request.query_params.get('category')
+        q = request.query_params.get('q')
+        assigned_professor = request.query_params.get('assigned_professor')
+        only_mine_prof = request.query_params.get('mine_prof') == '1'
 
         if from_date:
             queryset = queryset.filter(start__gte=from_date)
@@ -373,63 +388,167 @@ class ActivityViewSet(viewsets.ModelViewSet):
         if category:
             queryset = queryset.filter(category=category)
         if q:
-            from django.db import models as django_models
             queryset = queryset.filter(
-                django_models.Q(title__icontains=q) |
-                django_models.Q(description__icontains=q) |
-                django_models.Q(location__icontains=q) |
-                django_models.Q(instructor__icontains=q)
+                Q(title__icontains=q) |
+                Q(description__icontains=q) |
+                Q(location__icontains=q) |
+                Q(instructor__icontains=q)
             )
+        if assigned_professor:
+            queryset = queryset.filter(assigned_professor_id=assigned_professor)
+
+        # Professors requesting their own activities
+        user = request.user if request.user.is_authenticated else None
+        prof_profile = getattr(user, 'profile', None)
+        if user and prof_profile and prof_profile.is_professor and only_mine_prof:
+            queryset = queryset.filter(assigned_professor=user)
 
         return queryset
 
     def perform_create(self, serializer):
+        serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=['patch'], url_path='professor-update')
+    def professor_update(self, request, pk=None):
+        activity = self.get_object()
+        profile = getattr(request.user, 'profile', None)
+        if not profile or not profile.is_professor:
+            return Response({'detail': 'No autorizado'}, status=403)
+        if activity.assigned_professor_id != request.user.id:
+            return Response({'detail': 'Solo el profesor asignado puede modificar esta actividad'}, status=403)
+
+        # Limitar campos que puede cambiar el profesor
+        allowed_fields = {'description', 'location', 'start', 'end', 'status'}
+        partial_data = {k: v for k, v in request.data.items() if k in allowed_fields}
+        serializer = self.get_serializer(activity, data=partial_data, partial=True)
+        serializer.is_valid(raise_exception=True)
+        serializer.save()
+        return Response(serializer.data)
+
+    @action(detail=False, methods=['get'], url_path='professor/list')
+    def list_for_professor(self, request):
+        profile = getattr(request.user, 'profile', None)
+        if not profile or not profile.is_professor:
+            return Response({'detail': 'No autorizado'}, status=403)
+        qs = self.get_queryset().filter(assigned_professor=request.user)
+        serializer = self.get_serializer(qs, many=True)
+        return Response(serializer.data)
+
+    @action(detail=True, methods=['get'], url_path='enrollments')
+    def list_enrollments(self, request, pk=None):
+        activity = self.get_object()
+        # Admins or assigned professor can see enrollments; authenticated users see nothing sensitive
+        user = request.user
+        profile = getattr(user, 'profile', None)
+        if not user.is_staff and not user.is_superuser and not (profile and (profile.is_admin or (profile.is_professor and activity.assigned_professor_id == user.id))):
+            return Response({'detail': 'No autorizado'}, status=403)
+        qs = activity.enrollments.select_related('user', 'user__profile').order_by('-enrolled_at')
+        data = ActivityEnrollmentSerializer(qs, many=True).data
+        return Response(data)
+
+    @action(detail=True, methods=['post'], url_path='enroll')
+    def enroll(self, request, pk=None):
+        activity = self.get_object()
+        if not request.user.is_authenticated:
+            return Response({'detail': 'Auth required'}, status=401)
+        if activity.available_spots <= 0:
+            return Response({'detail': 'No hay cupos disponibles'}, status=400)
+        obj, created = ActivityEnrollment.objects.get_or_create(user=request.user, activity=activity)
+        if not created:
+            return Response({'detail': 'Ya estás inscrito'}, status=200)
+        # Decrement available spots
+        if activity.available_spots > 0:
+            activity.available_spots -= 1
+            activity.save(update_fields=['available_spots'])
+        return Response(ActivityEnrollmentSerializer(obj).data, status=201)
+
+    @action(detail=True, methods=['post'], url_path='unenroll')
+    def unenroll(self, request, pk=None):
+        activity = self.get_object()
+        if not request.user.is_authenticated:
+            return Response({'detail': 'Auth required'}, status=401)
+        try:
+            enr = ActivityEnrollment.objects.get(user=request.user, activity=activity)
+        except ActivityEnrollment.DoesNotExist:
+            return Response({'detail': 'No estás inscrito'}, status=400)
+        enr.delete()
+        # Return spot
+        activity.available_spots += 1
+        activity.save(update_fields=['available_spots'])
+        return Response({'ok': True})
+
+    @action(detail=True, methods=['patch'], url_path='professor/attendance')
+    def professor_attendance(self, request, pk=None):
+        activity = self.get_object()
+        user = request.user
+        profile = getattr(user, 'profile', None)
+        if not (profile and profile.is_professor and activity.assigned_professor_id == user.id):
+            return Response({'detail': 'No autorizado'}, status=403)
+        # Expect body: { "attended": [user_id, ...], "not_attended": [user_id, ...] }
+        attended_ids = request.data.get('attended', []) or []
+        not_attended_ids = request.data.get('not_attended', []) or []
+        # Update attended flags
+        qs = ActivityEnrollment.objects.filter(activity=activity, user_id__in=(attended_ids + not_attended_ids))
+        marked_attended = 0
+        for enr in qs:
+            flag = enr.user_id in attended_ids
+            if enr.attended != flag:
+                enr.attended = flag
+                enr.save(update_fields=['attended'])
+            if flag:
+                marked_attended += 1
+        # Auto update actual_attendees
+        activity.actual_attendees = ActivityEnrollment.objects.filter(activity=activity, attended=True).count()
+        activity.save(update_fields=['actual_attendees'])
+        return Response({'ok': True, 'actual_attendees': activity.actual_attendees, 'marked_attended': marked_attended})
+
+    @action(detail=True, methods=['patch'], url_path='professor/notes')
+    def professor_notes(self, request, pk=None):
+        activity = self.get_object()
+        user = request.user
+        profile = getattr(user, 'profile', None)
+        if not (profile and profile.is_professor and activity.assigned_professor_id == user.id):
+            return Response({'detail': 'No autorizado'}, status=403)
+        notes = request.data.get('notes', '')
+        activity.notes = notes
+        activity.save(update_fields=['notes'])
+        return Response({'ok': True, 'notes': activity.notes})
+
+
+# Tournament ViewSet
+class TournamentViewSet(viewsets.ModelViewSet):
+    """
+    API endpoint for Tournament CRUD operations
+    Only admins can create, update, or delete tournaments.
+    All authenticated users can view tournaments.
+    """
+    queryset = Tournament.objects.all().order_by('-start')
+    serializer_class = TournamentSerializer
+    permission_classes = [IsAdminOrReadOnly]
+    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
+    filterset_fields = ['sport', 'status', 'visibility']
+    search_fields = ['name', 'description', 'location']
+
+    def perform_create(self, serializer):
         """
-        Set the created_by field to the current user when creating an activity
+        Set the created_by field to the current user when creating a tournament
         """
         serializer.save(created_by=self.request.user)
 
 
-class ProjectViewSet(viewsets.ModelViewSet):
-    queryset = Project.objects.all()
-    serializer_class = ProjectSerializer
-    permission_classes = [IsAdminOrReadOnly]
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['type', 'status', 'area']
-    search_fields = ['name', 'description', 'area', 'subtype']
-
-    def get_queryset(self):
-        queryset = Project.objects.all().order_by('-created_at')
-        return queryset
-
-
-class EnrollmentViewSet(viewsets.ModelViewSet):
-    serializer_class = EnrollmentSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter]
-    filterset_fields = ['project', 'status']
-    search_fields = ['full_name', 'email']
-
-    def get_queryset(self):
-        user = self.request.user
-
-        if user.is_authenticated:
-            profile = getattr(user, 'profile', None)
-            if user.is_staff or user.is_superuser or (profile and profile.is_admin):
-                return Enrollment.objects.all().order_by('-enrollment_date')
-            else:
-                return Enrollment.objects.filter(
-                    models.Q(user=user) | models.Q(email=user.email)
-                ).order_by('-enrollment_date')
-
-        return Enrollment.objects.none()
-
-    def get_permissions(self):
-        if self.action == 'create':
-            return [permissions.AllowAny()]
-        elif self.action in ['list', 'retrieve']:
-            return [permissions.IsAuthenticated()]
-        else:
-            return [IsAdminOrReadOnly()]
-
-    def perform_create(self, serializer):
-        serializer.save()
+@require_GET
+@login_required
+def api_professors(request):
+    qs = User.objects.filter(profile__role='PROFESSOR').order_by('first_name', 'last_name', 'username')
+    data = [
+        {
+            'id': u.id,
+            'username': u.username,
+            'first_name': u.first_name,
+            'last_name': u.last_name,
+            'full_name': (u.get_full_name() or u.username),
+            'email': u.email,
+        }
+        for u in qs
+    ]
+    return JsonResponse(data, safe=False, status=200)

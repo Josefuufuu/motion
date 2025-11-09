@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import AppLayout from '../components/layout/AppLayout.jsx';
 import { useActividades } from '../hooks/useActividades.js';
 import { formatDate } from '../utils.js';
 import { Calendar as CalendarIcon, MapPin, Clock, Users, Tag as TagIcon, Eye } from 'lucide-react';
+import { useAuth } from '../context/AuthContext.jsx';
 
 const CATEGORY_LABELS = {
   DEPORTE: 'Deporte',
@@ -15,19 +16,98 @@ const CATEGORY_LABELS = {
 
 export default function ActivityDetailPage() {
   const { id } = useParams();
-  const { getActividad, loading, error } = useActividades();
+  const { getActividad, loading, error, getEnrollments, setAttendance, saveProfessorNotes, enrollInActivity, unenrollFromActivity } = useActividades();
+  const { user, isProfessor } = useAuth();
   const [activity, setActivity] = useState(null);
   const [notFound, setNotFound] = useState(false);
+  const [enrollments, setEnrollments] = useState([]);
+  const [attendedIds, setAttendedIds] = useState(new Set());
+  const [notes, setNotes] = useState('');
+  const [busy, setBusy] = useState(false);
+
+  const isAssignedProfessor = useMemo(() => {
+    if (!activity || !user) return false;
+    return isProfessor && isProfessor() && activity.assigned_professor === user.id;
+  }, [activity, user, isProfessor]);
 
   useEffect(() => {
     let isMounted = true;
     (async () => {
       const data = await getActividad(id);
       if (!isMounted) return;
-      if (data) { setActivity(data); setNotFound(false); } else { setActivity(null); setNotFound(true); }
+      if (data) {
+        setActivity(data);
+        setNotFound(false);
+        setNotes(data.notes || '');
+      } else {
+        setActivity(null);
+        setNotFound(true);
+      }
     })();
     return () => { isMounted = false; };
   }, [id, getActividad]);
+
+  useEffect(() => {
+    let isMounted = true;
+    (async () => {
+      if (!isAssignedProfessor) return;
+      const data = await getEnrollments(id);
+      if (!isMounted) return;
+      setEnrollments(Array.isArray(data) ? data : []);
+      const preset = new Set((data || []).filter(e => e.attended).map(e => e.user?.id));
+      setAttendedIds(preset);
+    })();
+    return () => { isMounted = false; };
+  }, [id, isAssignedProfessor, getEnrollments]);
+
+  const toggleAttendance = (uid) => {
+    setAttendedIds(prev => {
+      const next = new Set(prev);
+      if (next.has(uid)) next.delete(uid); else next.add(uid);
+      return next;
+    });
+  };
+
+  const handleSaveAttendance = async () => {
+    if (!activity) return;
+    setBusy(true);
+    try {
+      const allIds = enrollments.map(e => e.user.id);
+      const attended = Array.from(attendedIds);
+      const not_attended = allIds.filter(id => !attendedIds.has(id));
+      const resp = await setAttendance(activity.id, { attended, not_attended });
+      // update activity actual attendees
+      if (resp && typeof resp.actual_attendees === 'number') {
+        setActivity(a => ({ ...a, actual_attendees: resp.actual_attendees }));
+      }
+    } finally { setBusy(false); }
+  };
+
+  const handleSaveNotes = async () => {
+    if (!activity) return;
+    setBusy(true);
+    try {
+      await saveProfessorNotes(activity.id, notes);
+    } finally { setBusy(false); }
+  };
+
+  const handleEnroll = async () => {
+    if (!activity) return;
+    setBusy(true);
+    try {
+      await enrollInActivity(activity.id);
+      // optimistically reduce available spots
+      setActivity(a => a ? { ...a, available_spots: Math.max((a.available_spots ?? 0) - 1, 0) } : a);
+    } finally { setBusy(false); }
+  };
+  const handleUnenroll = async () => {
+    if (!activity) return;
+    setBusy(true);
+    try {
+      await unenrollFromActivity(activity.id);
+      setActivity(a => a ? { ...a, available_spots: (a.available_spots ?? 0) + 1 } : a);
+    } finally { setBusy(false); }
+  };
 
   const Header = () => (
     <header className="flex items-center justify-between">
@@ -135,11 +215,78 @@ export default function ActivityDetailPage() {
     );
   };
 
+  const ProfessorPanel = () => {
+    if (!isAssignedProfessor) return null;
+    return (
+      <section className="space-y-6">
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h3 className="mb-3 text-sm font-semibold text-slate-700">Asistentes ({activity?.actual_attendees ?? 0})</h3>
+          {enrollments.length === 0 ? (
+            <p className="text-sm text-slate-500">No hay inscritos aún.</p>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="min-w-full text-sm">
+                <thead>
+                  <tr className="border-b">
+                    <th className="p-2 text-left">Asistió</th>
+                    <th className="p-2 text-left">Nombre</th>
+                    <th className="p-2 text-left">Usuario</th>
+                    <th className="p-2 text-left">Inscrito</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {enrollments.map((e) => (
+                    <tr key={e.id} className="border-b">
+                      <td className="p-2">
+                        <input type="checkbox" checked={attendedIds.has(e.user?.id)} onChange={() => toggleAttendance(e.user?.id)} />
+                      </td>
+                      <td className="p-2">{[e.user?.first_name, e.user?.last_name].filter(Boolean).join(' ') || e.user?.username}</td>
+                      <td className="p-2">{e.user?.username}</td>
+                      <td className="p-2">{new Date(e.enrolled_at).toLocaleString()}</td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
+          <div className="mt-3 flex gap-2">
+            <button onClick={handleSaveAttendance} disabled={busy} className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700 disabled:opacity-50">Guardar asistencia</button>
+          </div>
+        </div>
+
+        <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+          <h3 className="mb-3 text-sm font-semibold text-slate-700">Notas del profesor</h3>
+          <textarea className="w-full rounded border border-slate-300 p-2" rows={4} value={notes} onChange={(e) => setNotes(e.target.value)} placeholder="Observaciones, incidencias, evaluaciones..." />
+          <div className="mt-3 flex gap-2">
+            <button onClick={handleSaveNotes} disabled={busy} className="rounded-md bg-emerald-600 px-3 py-2 text-white hover:bg-emerald-700 disabled:opacity-50">Guardar notas</button>
+          </div>
+        </div>
+      </section>
+    );
+  };
+
+  const StudentActions = () => {
+    if (isAssignedProfessor) return null; // no student actions for professor
+    if (!activity) return null;
+    return (
+      <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
+        <h3 className="mb-3 text-sm font-semibold text-slate-700">Participación</h3>
+        <div className="flex gap-2">
+          <button onClick={handleEnroll} disabled={busy || (activity.available_spots ?? 0) <= 0} className="rounded-md bg-indigo-600 px-3 py-2 text-white hover:bg-indigo-700 disabled:opacity-50">Inscribirme</button>
+          <button onClick={handleUnenroll} disabled={busy} className="rounded-md border border-slate-300 px-3 py-2 text-slate-700 hover:bg-slate-50">Cancelar inscripción</button>
+          <span className="text-sm text-slate-500 self-center">Cupos disponibles: {activity.available_spots ?? 0}</span>
+        </div>
+      </div>
+    );
+  };
+
   return (
     <AppLayout>
       <div className="space-y-6">
         <Header />
         <Content />
+        <ProfessorPanel />
+        <StudentActions />
       </div>
     </AppLayout>
   );

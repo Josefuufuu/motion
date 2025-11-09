@@ -1,13 +1,17 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from django.db import models
-from .models import Activity, UserProfile, Project, Enrollment
+from .models import Activity, UserProfile, Tournament, ActivityEnrollment
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
     class Meta:
         model = UserProfile
-        fields = ['role', 'is_admin', 'is_beneficiary', 'phone_number', 'program', 'semester']
+        fields = [
+            'role', 'is_admin', 'is_beneficiary',
+            'phone_number', 'program', 'semester',
+            'created_at', 'updated_at',
+        ]
+        read_only_fields = ['is_admin', 'is_beneficiary', 'created_at', 'updated_at']
 
 
 class UserSerializer(serializers.ModelSerializer):
@@ -18,16 +22,51 @@ class UserSerializer(serializers.ModelSerializer):
         fields = ['id', 'username', 'email', 'first_name', 'last_name', 'profile']
 
 
+class ActivityEnrollmentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+    user_id = serializers.PrimaryKeyRelatedField(
+        source='user', queryset=User.objects.all(), write_only=True, required=False
+    )
+
+    class Meta:
+        model = ActivityEnrollment
+        fields = ['id', 'user', 'user_id', 'attended', 'enrolled_at']
+        read_only_fields = ['id', 'enrolled_at', 'user']
+
+
 class ActivitySerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
+    # Campo para asignar profesor (solo id). Debe ser usuario con rol PROFESOR.
+    assigned_professor = serializers.PrimaryKeyRelatedField(
+        queryset=User.objects.all(), required=False, allow_null=True
+    )
+    # Nombre amigable del profesor (solo lectura)
+    assigned_professor_name = serializers.SerializerMethodField(read_only=True)
+    actual_attendees = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Activity
         fields = ['id', 'title', 'category', 'description', 'location',
                   'start', 'end', 'capacity', 'available_spots',
-                  'instructor', 'visibility', 'status', 'tags',
+                  'instructor', 'assigned_professor', 'assigned_professor_name',
+                  'visibility', 'status', 'tags', 'notes', 'actual_attendees',
                   'created_by', 'created_at', 'updated_at']
-        read_only_fields = ['created_by', 'created_at', 'updated_at']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'assigned_professor_name', 'actual_attendees']
+
+    def get_assigned_professor_name(self, obj):
+        user = getattr(obj, 'assigned_professor', None)
+        if not user:
+            return None
+        full_name = user.get_full_name()
+        return full_name if full_name else user.username
+
+    def validate_assigned_professor(self, value):
+        if value is None:
+            return value
+        profile = getattr(value, 'profile', None)
+        if not profile or profile.role != 'PROFESSOR':
+            raise serializers.ValidationError('El usuario asignado no tiene rol PROFESOR')
+        return value
 
     def validate(self, data):
         # Validate end time is after start time
@@ -51,77 +90,19 @@ class ActivitySerializer(serializers.ModelSerializer):
 
         return super().create(validated_data)
 
-
-class ProjectSerializer(serializers.ModelSerializer):
-    confirmed_enrollments = serializers.ReadOnlyField()
-    available_quota = serializers.ReadOnlyField()
-    already_enrolled = serializers.SerializerMethodField()
-
-    class Meta:
-        model = Project
-        fields = [
-            'id', 'name', 'type', 'area', 'subtype', 'description',
-            'total_quota', 'start_date', 'end_date', 'status',
-            'confirmed_enrollments', 'available_quota', 'already_enrolled',
-            'created_at', 'updated_at'
-        ]
-        read_only_fields = ['created_at', 'updated_at']
-
-    def get_already_enrolled(self, obj):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            return obj.enrollments.filter(
-                models.Q(user=request.user) | models.Q(email=request.user.email),
-                status='confirmed'
-            ).exists()
-        return False
+    def update(self, instance, validated_data):
+        return super().update(instance, validated_data)
 
 
-class EnrollmentSerializer(serializers.ModelSerializer):
-    project_name = serializers.ReadOnlyField(source='project.name')
-    user_email = serializers.ReadOnlyField(source='user.email')
+class TournamentSerializer(serializers.ModelSerializer):
+    created_by = UserSerializer(read_only=True)
 
     class Meta:
-        model = Enrollment
+        model = Tournament
         fields = [
-            'id', 'project', 'project_name', 'user', 'user_email',
-            'full_name', 'email', 'phone', 'status',
-            'enrollment_date', 'updated_at'
+            'id', 'name', 'sport', 'format', 'description', 'location',
+            'inscription_start', 'inscription_end',
+            'start', 'end', 'visibility', 'status', 'max_teams', 'current_teams', 'fixtures',
+            'created_by', 'created_at', 'updated_at'
         ]
-        read_only_fields = ['user', 'enrollment_date', 'updated_at']
-
-    def validate(self, data):
-        project = data.get('project') or getattr(self.instance, 'project', None)
-        if not project:
-            raise serializers.ValidationError({'project': 'Proyecto requerido'})
-
-        if project.status != 'enrollment':
-            raise serializers.ValidationError({
-                'project': f'Este proyecto no está aceptando inscripciones (Estado: {project.get_status_display()})'
-            })
-
-        if project.available_quota <= 0 and not self.instance:
-            raise serializers.ValidationError({'project': 'No hay cupos disponibles para este proyecto'})
-
-        if not self.instance:
-            email = (data.get('email') or '').strip()
-            if not email:
-                raise serializers.ValidationError({'email': 'El correo es obligatorio'})
-            if Enrollment.objects.filter(project=project, email=email).exists():
-                raise serializers.ValidationError({'project': 'Ya existe una inscripción con este correo para este proyecto'})
-
-        new_status = data.get('status')
-        if self.instance and new_status:
-            if new_status not in {'pending', 'confirmed', 'rejected', 'cancelled'}:
-                raise serializers.ValidationError({'status': 'Estado inválido'})
-
-        return data
-
-    def create(self, validated_data):
-        request = self.context.get('request')
-        if request and request.user.is_authenticated:
-            validated_data['user'] = request.user
-
-        validated_data['status'] = 'pending'
-        return super().create(validated_data)
-
+        read_only_fields = ['created_by', 'created_at', 'updated_at']
