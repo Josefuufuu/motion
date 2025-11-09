@@ -133,6 +133,14 @@ class UserProfileRegistrationForm(UserCreationForm):
     phone_number = forms.CharField(required=True, max_length=20)
     program = forms.CharField(required=True, max_length=120)
     semester = forms.IntegerField(required=True)
+    role = forms.ChoiceField(
+        required=True,
+        choices=[
+            (value, label)
+            for value, label in UserProfile.ROLE_CHOICES
+            if value in {"BENEFICIARY", "PROFESSOR"}
+        ],
+    )
 
     class Meta(UserCreationForm.Meta):
         fields = (
@@ -141,6 +149,7 @@ class UserProfileRegistrationForm(UserCreationForm):
             "phone_number",
             "program",
             "semester",
+            "role",
         )
 
     field_order = (
@@ -149,6 +158,7 @@ class UserProfileRegistrationForm(UserCreationForm):
         "phone_number",
         "program",
         "semester",
+        "role",
         "password1",
         "password2",
     )
@@ -183,11 +193,14 @@ class UserProfileRegistrationForm(UserCreationForm):
 
         if commit:
             user.save()
-            UserProfile.objects.create(
+            UserProfile.objects.update_or_create(
                 user=user,
-                phone_number=self.cleaned_data["phone_number"],
-                program=self.cleaned_data["program"],
-                semester=self.cleaned_data["semester"],
+                defaults={
+                    "phone_number": self.cleaned_data["phone_number"],
+                    "program": self.cleaned_data["program"],
+                    "semester": self.cleaned_data["semester"],
+                    "role": self.cleaned_data["role"],
+                },
             )
 
         return user
@@ -247,12 +260,28 @@ def api_register(request):
         "password2": "<str>",
         "phone_number": "<10-digit str>",
         "program": "<str>",
-        "semester": <int between 1 and 20>
+        "semester": <int between 1 and 20>,
+        "role": "BENEFICIARY" | "PROFESSOR"
     }
     """
 
     if request.method != "POST":
         return JsonResponse({"ok": False, "error": "Method not allowed"}, status=405)
+
+    if not request.user.is_authenticated:
+        return JsonResponse({"ok": False, "error": "Not authenticated"}, status=401)
+
+    user_profile = getattr(request.user, "profile", None)
+    has_admin_perms = any(
+        [
+            request.user.is_staff,
+            request.user.is_superuser,
+            getattr(user_profile, "is_admin", False),
+        ]
+    )
+
+    if not has_admin_perms:
+        return JsonResponse({"ok": False, "error": "Forbidden"}, status=403)
 
     payload = _load_body(request)
     if payload is None:
@@ -264,26 +293,17 @@ def api_register(request):
         return JsonResponse({"ok": False, "errors": errors}, status=400)
 
     user = form.save()
-    username = form.cleaned_data.get("username")
-    password = form.cleaned_data.get("password1")
-
-    authenticated_user = None
-    if username and password:
-        authenticated_user = authenticate(request, username=username, password=password)
-
-    if authenticated_user is not None:
-        login(request, authenticated_user)
-        logged_user = authenticated_user
-    else:
-        login(
-            request,
-            user,
-            backend="django.contrib.auth.backends.ModelBackend",
-        )
-        logged_user = user
+    user_data = _serialize_user(user)
 
     get_token(request)
-    return JsonResponse({"ok": True, "user": _serialize_user(logged_user)}, status=200)
+    return JsonResponse(
+        {
+            "ok": True,
+            "message": "Usuario creado correctamente.",
+            "user": user_data,
+        },
+        status=201,
+    )
 
 
 @csrf_exempt
