@@ -6,6 +6,7 @@ import homeIcon from "../../assets/icons/home-icon.png";
 import dashboardIcon from "../../assets/icons/dashboard-icon.png";
 import groupsIcon from "../../assets/icons/groups-icon.png";
 import notificationIcon from "../../assets/icons/notification-icon.png";
+import profileIcon from "../../assets/icons/profile-icon.png";
 import reportIcon from "../../assets/icons/report-icon.png";
 import trophyIcon from "../../assets/icons/trophy-icon.png";
 import brainIcon from "../../assets/icons/brain-icon.png";
@@ -23,6 +24,7 @@ const beneficiaryRoutes = [
 // Rutas para administradores
 const adminRoutes = [
   { key: "home", path: "/admin/home", icon: homeIcon, title: "Inicio Admin" },
+  { key: "register-user", path: "/admin/registrar-usuario", icon: profileIcon, title: "Registrar usuario" },
   { key: "gestion", path: "/gestion-cadi", icon: dashboardIcon, title: "Gestión CADI" },
   { key: "calendario", path: "/calendario", icon: calendarIcon, title: "Calendario" },
   { key: "torneos", path: "/admin/torneos", icon: trophyIcon, title: "Gestión Torneos" },

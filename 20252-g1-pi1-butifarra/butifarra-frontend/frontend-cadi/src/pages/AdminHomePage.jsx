@@ -14,6 +14,12 @@ import AppLayout from "../components/layout/AppLayout.jsx";
 
 const summaryCards = [
   {
+    title: "Registrar usuario",
+    description: "Crea cuentas para profesores o estudiantes",
+    to: "/admin/registrar-usuario",
+    icon: "➕",
+  },
+  {
     title: "Gestionar usuarios",
     description: "Revisa solicitudes y actualiza perfiles",
     to: "/admin/form-inscripcion",
@@ -65,6 +71,12 @@ const metrics = [
 ];
 
 const quickActions = [
+  {
+    label: "Registrar usuario",
+    description: "Dar acceso al CADI",
+    to: "/admin/registrar-usuario",
+    Icon: Users,
+  },
   {
     label: "Crear actividad",
     description: "Nueva experiencia CADI",

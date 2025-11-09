@@ -10,7 +10,7 @@ import HomeBeneficiary from "./pages/HomeBeneficiary.jsx";
 import AdminHomePage from "./pages/AdminHomePage.jsx";
 import CreateActivity from "./pages/CreateActivity.jsx";
 import LoginPage from "./pages/LoginPage.jsx";
-import SignupPage from "./pages/SignupPage.jsx";
+import AdminRegisterUserPage from "./pages/AdminRegisterUserPage.jsx";
 import AdminFormInscripcion from "./pages/AdminFormInscripcion.jsx";
 import AdminReport from "./pages/AdminReport.jsx";
 import NotificationsPage from "./pages/NotificationsPage.jsx";
@@ -280,6 +280,14 @@ export default function App() {
           )}
         />
         <Route
+          path="/admin/registrar-usuario"
+          element={(
+            <AdminRoute>
+              <AdminRegisterUserPage />
+            </AdminRoute>
+          )}
+        />
+        <Route
           path="/admin/torneos"
           element={(
             <AdminRoute>
@@ -294,7 +302,6 @@ export default function App() {
 
         {/* Rutas públicas */}
         <Route path="/login" element={<LoginPage />} />
-        <Route path="/register" element={<SignupPage />} />
         <Route path="*" element={<NotFound />} />
 
       </Routes>
