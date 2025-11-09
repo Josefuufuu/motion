@@ -8,6 +8,8 @@ import io
 import csv
 from datetime import datetime, timedelta
 
+from actividades.models import Activity, ActivityEnrollment
+
 # Importaciones que se requerirán cuando los modelos sean creados
 # from actividades.models import DatoEstadistico, Reporte, ControlAsistencia, RegistroAcceso, PermisoExportacion
 #Tengan en cuenta antes de correr las pruebas que tienen que comentar los assertTrue de los placeholders y descomentar las partes comentadas del código. los assertTrue están para que las pruebas no fallen mientras los modelos y vistas no estén implementados.
@@ -191,13 +193,13 @@ class TestReportesModels(TestCase):
         if hasattr(self, 'asistencia1'):
             # Verificar que el registro se creó correctamente
             self.assertEqual(ControlAsistencia.objects.count(), 1)
-            
+
             # Verificar atributos del registro
             asistencia = ControlAsistencia.objects.first()
             self.assertEqual(asistencia.estudiante, self.estudiante)
             self.assertTrue(asistencia.presente)
             self.assertEqual(asistencia.metodo, 'QR')
-            
+
             # Verificar relación con la actividad
             self.assertIsNotNone(asistencia.actividad)
             
@@ -909,3 +911,145 @@ class TestIntegracionDatos(TestCase):
         self.assertTrue(True)  # Placeholder
 
 
+class DashboardReportsAPITests(TestCase):
+    def setUp(self):
+        self.admin = User.objects.create_user(
+            username="admin_user",
+            email="admin@example.com",
+            password="password123",
+            is_staff=True,
+        )
+        self.student = User.objects.create_user(
+            username="student_user",
+            email="student@example.com",
+            password="password123",
+        )
+
+        now = timezone.now()
+        start_today = now.replace(hour=9, minute=0, second=0, microsecond=0)
+        start_yesterday = start_today - timedelta(days=1)
+        start_next_week = start_today + timedelta(days=3)
+        start_prev_week = start_today - timedelta(days=8)
+
+        self.activity_today = Activity.objects.create(
+            title="Entrenamiento funcional",
+            category="DEPORTE",
+            description="Sesión matutina",
+            location="Gimnasio",
+            start=start_today,
+            end=start_today + timedelta(hours=2),
+            capacity=20,
+            available_spots=10,
+            actual_attendees=8,
+            created_by=self.admin,
+        )
+        ActivityEnrollment.objects.create(
+            user=self.student,
+            activity=self.activity_today,
+            attended=True,
+        )
+
+        self.activity_yesterday = Activity.objects.create(
+            title="Pilates",
+            category="DEPORTE",
+            description="Clase intermedia",
+            location="Sala 2",
+            start=start_yesterday,
+            end=start_yesterday + timedelta(hours=1),
+            capacity=15,
+            available_spots=7,
+            actual_attendees=6,
+            created_by=self.admin,
+        )
+        ActivityEnrollment.objects.create(
+            user=self.admin,
+            activity=self.activity_yesterday,
+            attended=True,
+        )
+
+        Activity.objects.create(
+            title="Taller de pintura",
+            category="CULTURA",
+            description="Técnicas mixtas",
+            location="Sala Creativa",
+            start=start_next_week,
+            end=start_next_week + timedelta(hours=2),
+            capacity=25,
+            available_spots=12,
+            actual_attendees=5,
+            created_by=self.admin,
+        )
+
+        previous_week_activity = Activity.objects.create(
+            title="Rumba terapia",
+            category="BIENESTAR",
+            description="Clase recreativa",
+            location="Cancha",
+            start=start_prev_week,
+            end=start_prev_week + timedelta(hours=1),
+            capacity=30,
+            available_spots=15,
+            actual_attendees=10,
+            created_by=self.admin,
+        )
+
+        Activity.objects.filter(pk=previous_week_activity.pk).update(
+            created_at=start_prev_week,
+            updated_at=start_prev_week,
+        )
+
+        cancelled_activity = Activity.objects.create(
+            title="Festival deportivo",
+            category="EVENTO",
+            description="Jornada especial",
+            location="Coliseo",
+            start=start_today + timedelta(days=1),
+            end=start_today + timedelta(days=1, hours=3),
+            capacity=50,
+            available_spots=50,
+            status="cancelled",
+            created_by=self.admin,
+        )
+        Activity.objects.filter(pk=cancelled_activity.pk).update(updated_at=now - timedelta(days=3))
+
+    def test_dashboard_reports_returns_metrics_for_admin(self):
+        client = Client()
+        client.force_login(self.admin)
+
+        response = client.get("/api/reports/dashboard/")
+        self.assertEqual(response.status_code, 200)
+
+        payload = response.json()
+
+        self.assertIn("summary_cards", payload)
+        self.assertIn("weekly_metrics", payload)
+        self.assertIn("recent_activities", payload)
+
+        self.assertEqual(len(payload["summary_cards"]), 4)
+        first_card = payload["summary_cards"][0]
+        self.assertIn("key", first_card)
+        self.assertIn("label", first_card)
+        self.assertIn("value", first_card)
+        self.assertIn("change", first_card)
+        self.assertIn("format", first_card)
+
+        self.assertEqual(len(payload["weekly_metrics"]), 3)
+        for metric in payload["weekly_metrics"]:
+            self.assertIn("key", metric)
+            self.assertIn("label", metric)
+            self.assertIn("current", metric)
+            self.assertIn("previous", metric)
+            self.assertIn("change", metric)
+
+        self.assertGreaterEqual(len(payload["recent_activities"]), 1)
+        recent = payload["recent_activities"][0]
+        self.assertIn("title", recent)
+        self.assertIn("start", recent)
+        self.assertTrue(isinstance(recent["start"], str))
+
+    def test_dashboard_reports_rejects_non_admin(self):
+        client = Client()
+        client.force_login(self.student)
+
+        response = client.get("/api/reports/dashboard/")
+        self.assertEqual(response.status_code, 403)

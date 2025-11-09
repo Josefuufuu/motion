@@ -25,6 +25,7 @@ urlpatterns = [
     path('api/user/activities', views.api_user_activities),
     # List professors
     path('api/professors/', views.api_professors),
+    path('api/reports/dashboard/', views.api_reports_dashboard),
 
     # Include the router URLs for the Activity and Tournament APIs
     path('', include(router.urls)),

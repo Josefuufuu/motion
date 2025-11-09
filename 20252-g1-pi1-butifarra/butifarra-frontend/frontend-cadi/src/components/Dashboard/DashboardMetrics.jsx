@@ -1,29 +1,60 @@
-import React from 'react';
-import { MetricCard } from './MetricCard';
+import React from "react";
+import { MetricCard } from "./MetricCard";
+import dashboardIcon from "../../assets/icons/dashboard-icon.png";
+import groupsIcon from "../../assets/icons/groups-icon.png";
+import reportIcon from "../../assets/icons/report-icon.png";
+import notificationIcon from "../../assets/icons/notification-icon.png";
 
-// Replace these with your actual icons
-import asistenciaIcon from '../../assets/icons/brain-icon.png';
-import inscripcionesIcon from '../../assets/icons/brain-icon.png';
-import ocupacionIcon from '../../assets/icons/brain-icon.png';
-import incidenciasIcon from '../../assets/icons/brain-icon.png';
+const ICON_BY_KEY = {
+  attendance_today: dashboardIcon,
+  open_enrollments: groupsIcon,
+  occupancy_rate: reportIcon,
+  weekly_incidents: notificationIcon,
+};
 
-export const DashboardMetrics = () => {
-  const metrics = [
-    { title: 'Asistencia hoy', value: 324, change: 10, icon: asistenciaIcon },
-    { title: 'Inscripciones abiertas', value: 1245, change: 6, icon: inscripcionesIcon },
-    { title: 'Ocupación', value: '85%', change: -2, icon: ocupacionIcon },
-    { title: 'Incidencias', value: 3, change: 0, icon: incidenciasIcon },
-  ];
+export const DashboardMetrics = ({ metrics = [], loading, hasError }) => {
+  if (loading) {
+    return (
+      <div className="flex flex-wrap justify-start gap-x-[22px] gap-y-6 px-[32px]">
+        {Array.from({ length: 4 }).map((_, index) => (
+          <div
+            key={`metric-skeleton-${index}`}
+            className="flex-grow basis-[calc((100%-66px)/4)] min-w-[180px] max-w-[260px]"
+          >
+            <MetricCard loading />
+          </div>
+        ))}
+      </div>
+    );
+  }
+
+  if (hasError) {
+    return (
+      <div className="px-[32px] text-sm text-slate-500">
+        No se pudieron cargar las métricas del dashboard.
+      </div>
+    );
+  }
+
+  if (!metrics.length) {
+    return (
+      <div className="px-[32px] text-sm text-slate-500">No hay métricas para mostrar.</div>
+    );
+  }
 
   return (
-    <div className="flex flex-wrap gap-x-[22px] gap-y-6 px-[32px] justify-start">
-      {metrics.map((metric, index) => (
-        <div key={index} className="flex-grow basis-[calc((100%-66px)/4)] max-w-[260px] min-w-[180px]">
+    <div className="flex flex-wrap justify-start gap-x-[22px] gap-y-6 px-[32px]">
+      {metrics.map((metric) => (
+        <div
+          key={metric.key}
+          className="flex-grow basis-[calc((100%-66px)/4)] min-w-[180px] max-w-[260px]"
+        >
           <MetricCard
-            title={metric.title}
+            title={metric.label}
             value={metric.value}
             change={metric.change}
-            icon={metric.icon}
+            format={metric.format}
+            icon={ICON_BY_KEY[metric.key] ?? dashboardIcon}
           />
         </div>
       ))}
