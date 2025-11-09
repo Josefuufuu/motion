@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import {
   Activity,
@@ -11,6 +11,10 @@ import {
 } from "lucide-react";
 import { useAuth } from "../context/AuthContext";
 import AppLayout from "../components/layout/AppLayout.jsx";
+import {
+  fetchDashboardReports,
+  formatMetricValue,
+} from "../services/reportsService";
 
 const summaryCards = [
   {
@@ -36,37 +40,6 @@ const summaryCards = [
     description: "Indicadores y reportes de bienestar",
     to: "/admin/reports",
     icon: "📊",
-  },
-];
-
-const metrics = [
-  {
-    title: "Asistencia hoy",
-    value: "324",
-    change: "+12%",
-    tone: "text-emerald-600",
-    Icon: Users,
-  },
-  {
-    title: "Inscripciones activas",
-    value: "1.245",
-    change: "+6%",
-    tone: "text-emerald-600",
-    Icon: ClipboardList,
-  },
-  {
-    title: "Ocupación",
-    value: "85%",
-    change: "-2%",
-    tone: "text-rose-500",
-    Icon: BarChart3,
-  },
-  {
-    title: "Incidencias",
-    value: "3",
-    change: "+1%",
-    tone: "text-rose-500",
-    Icon: Activity,
   },
 ];
 
@@ -97,28 +70,149 @@ const quickActions = [
   },
 ];
 
-const recentActivities = [
-  { name: "Yoga matutino", attendees: "15 participantes", tone: "text-violet-600" },
-  { name: "Torneo fútbol 5", attendees: "8 participantes", tone: "text-emerald-600" },
-  { name: "Taller fotografía", attendees: "20 participantes", tone: "text-slate-500" },
-];
+const METRIC_ICON_MAP = {
+  attendance_today: Users,
+  open_enrollments: ClipboardList,
+  occupancy_rate: BarChart3,
+  weekly_incidents: Activity,
+};
 
-const weeklyMetrics = [
-  { label: "Nuevos usuarios", value: "+23%", tone: "text-emerald-600" },
-  { label: "Actividades completadas", value: "+18%", tone: "text-emerald-600" },
-  { label: "Cancelaciones", value: "+5%", tone: "text-rose-500" },
-  { label: "Satisfacción promedio", value: "+2%", tone: "text-emerald-600" },
-];
+const STATUS_TONE_MAP = {
+  active: "text-emerald-600",
+  finished: "text-slate-500",
+  cancelled: "text-rose-500",
+  pending: "text-amber-500",
+};
+
+const FALLBACK_METRIC_ICONS = [Users, ClipboardList, BarChart3, Activity];
+
+function formatChange(change) {
+  if (typeof change !== "number" || !Number.isFinite(change)) {
+    return "–";
+  }
+  const rounded = Number(change.toFixed(1));
+  const prefix = rounded > 0 ? "+" : "";
+  return `${prefix}${rounded}%`;
+}
+
+function getTone(change) {
+  if (typeof change !== "number" || !Number.isFinite(change)) {
+    return "text-slate-400";
+  }
+  if (change > 0) {
+    return "text-emerald-600";
+  }
+  if (change < 0) {
+    return "text-rose-500";
+  }
+  return "text-slate-500";
+}
+
+function mapSummaryCards(cards = []) {
+  return cards.map((card, index) => {
+    const Icon = METRIC_ICON_MAP[card.key] ?? FALLBACK_METRIC_ICONS[index % FALLBACK_METRIC_ICONS.length];
+    const value = formatMetricValue(card.value, card.format);
+    const changeText = formatChange(card.change);
+
+    return {
+      key: card.key ?? `metric-${index}`,
+      title: card.label || "Métrica",
+      value,
+      change: changeText,
+      tone: getTone(card.change),
+      Icon,
+    };
+  });
+}
+
+function mapWeeklyMetrics(metrics = []) {
+  return metrics.map((metric, index) => ({
+    key: metric.key ?? `weekly-${index}`,
+    label: metric.label || "Métrica",
+    value: formatChange(metric.change),
+    tone: getTone(metric.change),
+  }));
+}
+
+function mapRecentActivities(activities = []) {
+  return activities.map((activity, index) => {
+    const attendeesValue =
+      activity.actualAttendees ?? activity.enrollments ?? activity.participants ?? null;
+    const attendeesText =
+      attendeesValue !== null
+        ? `${formatMetricValue(attendeesValue)} participantes`
+        : "Sin datos";
+
+    return {
+      key: activity.id ?? index,
+      name: activity.title || "Actividad",
+      attendees: attendeesText,
+      tone: STATUS_TONE_MAP[activity.status] ?? "text-slate-500",
+    };
+  });
+}
 
 export default function AdminHomePage() {
   const { user } = useAuth();
   const navigate = useNavigate();
+
+  const [metrics, setMetrics] = useState([]);
+  const [recentActivities, setRecentActivities] = useState([]);
+  const [weeklyMetrics, setWeeklyMetrics] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState(null);
+
+  useEffect(() => {
+    let isMounted = true;
+    const controller = new AbortController();
+
+    const loadDashboard = async () => {
+      try {
+        setLoading(true);
+        const result = await fetchDashboardReports({ signal: controller.signal });
+        if (!isMounted) {
+          return;
+        }
+        setMetrics(mapSummaryCards(result.summaryCards || []));
+        setRecentActivities(mapRecentActivities(result.recentActivities || []));
+        setWeeklyMetrics(mapWeeklyMetrics(result.weeklyMetrics || []));
+        setError(null);
+      } catch (err) {
+        if (err.name === "AbortError") {
+          return;
+        }
+        if (!isMounted) {
+          return;
+        }
+        setMetrics([]);
+        setRecentActivities([]);
+        setWeeklyMetrics([]);
+        setError(err.message || "Ocurrió un error al cargar la información del dashboard.");
+      } finally {
+        if (isMounted) {
+          setLoading(false);
+        }
+      }
+    };
+
+    loadDashboard();
+
+    return () => {
+      isMounted = false;
+      controller.abort();
+    };
+  }, []);
 
   const adminName = user?.first_name || user?.username || "Administrador";
 
   return (
     <AppLayout>
       <div className="space-y-8">
+        {error ? (
+          <div className="rounded-lg border border-red-200 bg-red-50 p-4 text-sm text-red-700">
+            {error}
+          </div>
+        ) : null}
         {/* Hero - Banner distintivo para administradores */}
         <section className="rounded-2xl bg-gradient-to-r from-purple-600 to-indigo-600 p-6 text-white shadow-lg">
           <div className="flex items-center gap-2 mb-2">
@@ -156,23 +250,47 @@ export default function AdminHomePage() {
 
         {/* Métricas principales */}
         <section className="grid gap-4 sm:grid-cols-2 xl:grid-cols-4">
-          {metrics.map(({ title, value, change, tone, Icon }) => (
-            <div
-              key={title}
-              className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
-            >
-              <div className="flex items-start justify-between">
-                <div>
-                  <p className="text-sm text-slate-500">{title}</p>
-                  <p className="mt-2 text-2xl font-semibold text-slate-800">{value}</p>
+          {loading
+            ? Array.from({ length: 4 }).map((_, index) => (
+                <div
+                  key={`metric-skeleton-${index}`}
+                  className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between animate-pulse">
+                    <div className="space-y-2">
+                      <div className="h-4 w-24 rounded bg-slate-200" />
+                      <div className="h-6 w-20 rounded bg-slate-200" />
+                    </div>
+                    <span className="h-10 w-10 rounded-full bg-slate-200" />
+                  </div>
+                  <span className="mt-4 h-4 w-28 rounded bg-slate-200 animate-pulse" />
                 </div>
-                <span className="rounded-full bg-violet-100 p-2 text-violet-600">
-                  <Icon className="size-5" />
-                </span>
-              </div>
-              <span className={`mt-4 text-xs font-semibold ${tone}`}>{change} respecto a la semana pasada</span>
-            </div>
-          ))}
+              ))
+            : metrics.length
+            ? metrics.map(({ key, title, value, change, tone, Icon }) => (
+                <div
+                  key={key}
+                  className="flex flex-col justify-between rounded-2xl border border-slate-200 bg-white p-5 shadow-sm"
+                >
+                  <div className="flex items-start justify-between">
+                    <div>
+                      <p className="text-sm text-slate-500">{title}</p>
+                      <p className="mt-2 text-2xl font-semibold text-slate-800">{value}</p>
+                    </div>
+                    <span className="rounded-full bg-violet-100 p-2 text-violet-600">
+                      <Icon className="size-5" />
+                    </span>
+                  </div>
+                  <span className={`mt-4 text-xs font-semibold ${tone}`}>
+                    {change !== "–" ? `${change} respecto a la semana pasada` : "Sin variación disponible"}
+                  </span>
+                </div>
+              ))
+            : (
+                <div className="sm:col-span-2 xl:col-span-4 rounded-2xl border border-dashed border-slate-200 bg-white p-6 text-center text-sm text-slate-500">
+                  No hay métricas disponibles.
+                </div>
+              )}
         </section>
 
         {/* Acciones rápidas */}
@@ -202,27 +320,65 @@ export default function AdminHomePage() {
           {/* Actividades recientes */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-800">📋 Actividades recientes</h3>
-            <ul className="mt-4 space-y-3">
-              {recentActivities.map((activity, index) => (
-                <li key={index} className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
-                  <span className="font-medium text-slate-700">{activity.name}</span>
-                  <span className={`text-sm ${activity.tone}`}>{activity.attendees}</span>
-                </li>
-              ))}
-            </ul>
+            {loading ? (
+              <ul className="mt-4 space-y-3">
+                {Array.from({ length: 3 }).map((_, index) => (
+                  <li
+                    key={`activity-skeleton-${index}`}
+                    className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
+                  >
+                    <span className="h-4 w-40 rounded bg-slate-200 animate-pulse" />
+                    <span className="h-4 w-24 rounded bg-slate-200 animate-pulse" />
+                  </li>
+                ))}
+              </ul>
+            ) : recentActivities.length ? (
+              <ul className="mt-4 space-y-3">
+                {recentActivities.map((activity) => (
+                  <li
+                    key={activity.key}
+                    className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
+                  >
+                    <span className="font-medium text-slate-700">{activity.name}</span>
+                    <span className={`text-sm ${activity.tone}`}>{activity.attendees}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-slate-500">No hay actividades recientes registradas.</p>
+            )}
           </div>
 
           {/* Métricas semanales */}
           <div className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
             <h3 className="text-lg font-semibold text-slate-800">📈 Métricas de la semana</h3>
-            <ul className="mt-4 space-y-3">
-              {weeklyMetrics.map((metric, index) => (
-                <li key={index} className="flex items-center justify-between rounded-lg border border-slate-100 p-3">
-                  <span className="font-medium text-slate-700">{metric.label}</span>
-                  <span className={`text-sm font-semibold ${metric.tone}`}>{metric.value}</span>
-                </li>
-              ))}
-            </ul>
+            {loading ? (
+              <ul className="mt-4 space-y-3">
+                {Array.from({ length: 4 }).map((_, index) => (
+                  <li
+                    key={`weekly-skeleton-${index}`}
+                    className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
+                  >
+                    <span className="h-4 w-44 rounded bg-slate-200 animate-pulse" />
+                    <span className="h-4 w-16 rounded bg-slate-200 animate-pulse" />
+                  </li>
+                ))}
+              </ul>
+            ) : weeklyMetrics.length ? (
+              <ul className="mt-4 space-y-3">
+                {weeklyMetrics.map((metric) => (
+                  <li
+                    key={metric.key}
+                    className="flex items-center justify-between rounded-lg border border-slate-100 p-3"
+                  >
+                    <span className="font-medium text-slate-700">{metric.label}</span>
+                    <span className={`text-sm font-semibold ${metric.tone}`}>{metric.value}</span>
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-4 text-sm text-slate-500">No hay métricas semanales disponibles.</p>
+            )}
           </div>
         </section>
       </div>
