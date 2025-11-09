@@ -20,7 +20,8 @@
     "react-big-calendar": "^1.19.4",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.9.1"
+    "react-router-dom": "^7.9.1",
+    "qrcode.react": "file:src/vendor/qrcode.react"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
