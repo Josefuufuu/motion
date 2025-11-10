@@ -29,11 +29,10 @@ DEBUG = False
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
 # ✅ ADD THIS
-INSTALLED_APPS += [
-    "butifarra.actividades",
-]
-
-
+# Añade la AppConfig de actividades
+INSTALLED_APPS = list(INSTALLED_APPS)  # asegúrate de que sea lista
+if "butifarra.actividades.apps.ActividadesConfig" not in INSTALLED_APPS:
+    INSTALLED_APPS.append("butifarra.actividades.apps.ActividadesConfig")
 # --- Ensure actividades app is loaded during tests ---
 try:
     INSTALLED_APPS  # noqa
