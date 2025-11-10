@@ -1,9 +1,5 @@
-import pytest
 from django.contrib.auth.models import User
 from django.test import Client, TestCase
-
-
-pytestmark = pytest.mark.django_db
 
 
 class UserRoleTests(TestCase):
