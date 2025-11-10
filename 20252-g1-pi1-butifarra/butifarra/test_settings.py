@@ -18,7 +18,7 @@ class DisableMigrations:
     def __getitem__(self, item):
         return None
 
-# MIGRATION_MODULES = DisableMigrations()
+MIGRATION_MODULES = DisableMigrations()
 
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
