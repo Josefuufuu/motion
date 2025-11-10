@@ -1,9 +1,66 @@
-import React, { useState, useRef } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import AppLayout from '../components/layout/AppLayout.jsx';
 import CampaignsView from './CampaignsView'; 
 import CreateNotificationView from './CreateNotificationView';
 import Toast from '../components/ui/Toast';
 import Modal from '../components/ui/Modal'; // 1. Importamos el Modal
+
+async function fetchCampaigns(setCampaigns) {
+  try {
+    const resp = await fetch('/api/notifications/campaigns/', { credentials: 'include' });
+    if (!resp.ok) return;
+    const data = await resp.json();
+    // Normalizar a estructura usada por la UI
+    const mapped = data.map(c => ({
+      id: c.id,
+      name: c.name,
+      type: 'Campaña',
+      message: c.message,
+      channel: c.channel_option,
+      segment: c.segment,
+      schedule: c.schedule_at || 'Inmediata',
+      metrics: `${c.total_recipients} destinatarios`,
+      metricsSubtitle: `${c.app_sent} app / ${c.emails_sent} email`,
+      status: c.schedule_at ? 'Programada' : 'Enviada',
+    }));
+    setCampaigns(mapped);
+  } catch (e) {
+    // Silenciar errores por ahora
+  }
+}
+
+async function broadcastCampaign(formData, setCampaigns, setActiveTab, setEditingCampaign) {
+  const csrftoken = document.cookie.split('; ').find(r => r.startsWith('csrftoken='))?.split('=')[1];
+  const payload = {
+    name: formData.name,
+    message: formData.message,
+    channel: formData.channel || 'AMBOS',
+    segment: formData.segment || 'Todos los usuarios',
+    scheduleDate: formData.scheduleDate || null,
+    scheduleTime: formData.scheduleTime || null,
+  };
+  try {
+    const resp = await fetch('/api/notifications/broadcast/', {
+      method: 'POST',
+      credentials: 'include',
+      headers: {
+        'Content-Type': 'application/json',
+        ...(csrftoken ? { 'X-CSRFToken': csrftoken } : {}),
+      },
+      body: JSON.stringify(payload),
+    });
+    if (resp.ok) {
+      await fetchCampaigns(setCampaigns);
+      setEditingCampaign(null);
+      setActiveTab('Campañas');
+    } else {
+      // Manejo simple de error
+      console.error('Error al crear campaña');
+    }
+  } catch (e) {
+    console.error('Error de red al crear campaña', e);
+  }
+}
 
 export default function NotificationsPage() {
   const [activeTab, setActiveTab] = useState('Campañas');
@@ -47,38 +104,13 @@ export default function NotificationsPage() {
   // --- FUNCIÓN UNIFICADA PARA CREAR Y EDITAR ---
   const handleSaveCampaign = (formData) => {
     if (editingCampaign) {
-      // MODO EDICIÓN: Actualiza la campaña existente
-      setCampaigns(prev => 
-        prev.map(c => 
-          c.id === editingCampaign.id 
-            ? { 
-                ...c, // Mantiene ID, métricas y estado originales
-                name: formData.name,
-                type: formData.type,
-                message: formData.message,
-                channel: formData.channel,
-                segment: formData.segment,
-                schedule: `${formData.scheduleDate} ${formData.scheduleTime || '09:00'}`,
-              } 
-            : c
-        )
-      );
-      setEditingCampaign(null); // Sale del modo edición
+      // Edición local (no persistida) - podría ampliarse si se implementa actualización de campañas
+      setCampaigns(prev => prev.map(c => c.id === editingCampaign.id ? { ...c, name: formData.name, message: formData.message, channel: formData.channel, segment: formData.segment, schedule: `${formData.scheduleDate} ${formData.scheduleTime}` } : c));
+      setEditingCampaign(null);
+      setActiveTab('Campañas');
     } else {
-      // MODO CREACIÓN: Añade una nueva campaña
-      const newCampaign = {
-        id: Date.now(),
-        name: formData.name,
-        type: formData.type,
-        message: formData.message,
-        channel: formData.channel,
-        segment: formData.segment,
-        schedule: `${formData.scheduleDate} ${formData.scheduleTime || '09:00'}`,
-        metrics: '0 enviados',
-        metricsSubtitle: 'Pendiente',
-        status: 'Programada',
-      };
-      setCampaigns(prev => [newCampaign, ...prev]);
+      // Persistir vía broadcast
+      broadcastCampaign(formData, setCampaigns, setActiveTab, setEditingCampaign);
     }
   };
 
@@ -97,6 +129,8 @@ export default function NotificationsPage() {
     setIsModalOpen(true); // Abrimos el modal
   };
   
+  useEffect(() => { fetchCampaigns(setCampaigns); }, []);
+
   return (
     <AppLayout>
       <div className="notifications-page">

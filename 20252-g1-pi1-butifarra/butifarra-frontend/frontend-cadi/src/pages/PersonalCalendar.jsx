@@ -217,7 +217,8 @@ export default function PersonalCalendar() {
                             : "No hay cupos disponibles"}
                         </span>
                         <button
-                          onClick={() => window.location.href = selectedEvent.registerUrl}
+                          data-register-url={selectedEvent.registerUrl}
+                          onClick={() => window.location.assign(selectedEvent.registerUrl)}
                           disabled={selectedEvent.availableSpots <= 0 || new Date(selectedEvent.end) < new Date()}
                           className={`px-4 py-2 rounded-md text-sm font-medium focus:outline-none ${
                             selectedEvent.availableSpots > 0 && new Date(selectedEvent.end) >= new Date()

@@ -5,7 +5,24 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="d678effe-0d0d-45fb-8bea-3b99cc7f718b" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_activities.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_checkin_system.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_notifications.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_users_auth.py" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/butifarra/butifarra/test_settings.py" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_analitica_reportes.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_analitica_reportes.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_cadi.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_cadi.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_checkin.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_checkin.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_csrf_tokens.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_csrf_tokens.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_eventos_servicios.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_eventos_servicios.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_informacion.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_informacion.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_tournament_enrollment.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_tournament_enrollment.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/actividades/tests/test_user_activities_api.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/actividades/tests/test_user_activities_api.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/butifarra/test_settings.py" beforeDir="false" afterPath="$PROJECT_DIR$/butifarra/test_settings.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/conftest.py" beforeDir="false" afterPath="$PROJECT_DIR$/conftest.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/pytest.ini" beforeDir="false" afterPath="$PROJECT_DIR$/pytest.ini" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -49,7 +66,7 @@
     &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
     &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;feature/fixDuplicados&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;Develop&quot;,
     &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
     &quot;kotlin-language-version-configured&quot;: &quot;true&quot;,
     &quot;last_opened_file_path&quot;: &quot;C:/Users/kevin/Desktop/Estudios/Semestre_6_Icesi/Proyecto_integrador_1/pruebas/20252-g1-pi1-butifarra&quot;,
@@ -201,6 +218,9 @@
       <workItem from="1761607959181" duration="213000" />
       <workItem from="1761608393252" duration="8024000" />
       <workItem from="1762648964491" duration="154000" />
+      <workItem from="1762768303192" duration="4086000" />
+      <workItem from="1762777312780" duration="3012000" />
+      <workItem from="1762798552002" duration="4157000" />
     </task>
     <servers />
   </component>
@@ -208,6 +228,6 @@
     <option name="version" value="3" />
   </component>
   <component name="com.intellij.coverage.CoverageDataManagerImpl">
-    <SUITE FILE_PATH="coverage/20252_g1_pi1_butifarra$.coverage" NAME=" Coverage Results" MODIFIED="1760901975436" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
+    <SUITE FILE_PATH="coverage/20252_g1_pi1_butifarra$.coverage" NAME=" Coverage Results" MODIFIED="1762802083522" SOURCE_PROVIDER="com.intellij.coverage.DefaultCoverageFileProvider" RUNNER="coverage.py" COVERAGE_BY_TEST_ENABLED="false" COVERAGE_TRACING_ENABLED="false" WORKING_DIRECTORY="$PROJECT_DIR$" />
   </component>
 </project>

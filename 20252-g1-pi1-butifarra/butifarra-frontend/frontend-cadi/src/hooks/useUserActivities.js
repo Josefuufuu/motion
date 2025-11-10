@@ -10,14 +10,10 @@ export default function useUserActivities() {
   useEffect(() => {
     async function fetchActivities() {
       try {
-        const data = await getUserActivities();
-        // Normaliza fechas en caso de que vengan en string
-        const normalized = data.map((activity) => ({
-          ...activity,
-          start: new Date(activity.start),
-          end: new Date(activity.end),
-        }));
-        setActivities(normalized);
+        const { activities: enrolledActivities, tournaments } =
+          await getUserActivities();
+        const merged = [...enrolledActivities, ...tournaments];
+        setActivities(merged);
       } catch (err) {
         setError(err);
       } finally {

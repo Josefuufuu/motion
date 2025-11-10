@@ -8,23 +8,29 @@
     "start": "vite",
     "build": "vite build",
     "lint": "eslint .",
-    "preview": "vite preview"
+    "preview": "vite preview",
+    "test": "vitest"
   },
   "dependencies": {
     "@tailwindcss/vite": "^4.1.13",
     "axios": "^1.12.2",
+    "chart.js": "^4.4.7",
     "date-fns": "^4.1.0",
     "lucide-react": "^0.544.0",
     "prop-types": "^15.8.1",
     "qrcode.react": "file:src/vendor/qrcode.react",
     "react": "^19.1.1",
     "react-big-calendar": "^1.19.4",
+    "react-chartjs-2": "^5.3.0",
     "react-dom": "^19.1.1",
     "react-icons": "^5.5.0",
-    "react-router-dom": "^7.9.1"
+    "react-router-dom": "^7.9.1",
+    "xlsx": "file:src/utils/xlsx"
   },
   "devDependencies": {
     "@eslint/js": "^9.33.0",
+    "@testing-library/jest-dom": "^6.6.3",
+    "@testing-library/react": "^16.1.0",
     "@types/react": "^19.1.10",
     "@types/react-dom": "^19.1.7",
     "@vitejs/plugin-react-swc": "^4.0.0",
@@ -36,6 +42,7 @@
     "globals": "^16.3.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^4.1.14",
-    "vite": "^7.1.6"
+    "vite": "^7.1.6",
+    "vitest": "^4.0.8"
   }
 }

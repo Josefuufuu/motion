@@ -201,3 +201,31 @@ SESSION_COOKIE_SECURE = _get_bool_setting(
 CSRF_COOKIE_SECURE = _get_bool_setting(
     "CSRF_COOKIE_SECURE", CSRF_COOKIE_SAMESITE == "None"
 )
+
+# Notification settings
+SEND_EMAIL_IMMEDIATE = _get_bool_setting("SEND_EMAIL_IMMEDIATE", True)
+DEFAULT_FROM_EMAIL = os.getenv("DEFAULT_FROM_EMAIL", "cifuentesclud@gmail.com")
+
+# Email SMTP configuration (use environment variables for secrets)
+EMAIL_BACKEND = os.getenv("EMAIL_BACKEND", "django.core.mail.backends.smtp.EmailBackend")
+EMAIL_HOST = os.getenv("EMAIL_HOST", "smtp.gmail.com")
+EMAIL_PORT = int(os.getenv("EMAIL_PORT", "587"))
+EMAIL_USE_TLS = _get_bool_setting("EMAIL_USE_TLS", True)
+EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER", "cifuentesclud@gmail.com")
+EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD", "odkr npmi ojyo ftda")
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': False,
+    'handlers': {
+        'console': {
+            'class': 'logging.StreamHandler',
+        },
+    },
+    'loggers': {
+        'actividades.email': {
+            'handlers': ['console'],
+            'level': 'INFO',
+        },
+    },
+}

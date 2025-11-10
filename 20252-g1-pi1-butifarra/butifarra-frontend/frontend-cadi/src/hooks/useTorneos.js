@@ -89,6 +89,48 @@ export const useTorneos = () => {
     }
   };
 
+  const enrollInTournament = async (tournamentId) => {
+    const csrftoken = getCookie('csrftoken');
+    try {
+      const data = await apiFetch(`/api/torneos/${tournamentId}/enroll/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({}),
+      });
+      setTorneos(prev => prev.map(t => (t.id === data.tournament.id ? data.tournament : t)));
+      showToast(data.detail || 'Inscripción realizada correctamente.', 'success');
+      return data;
+    } catch (err) {
+      showToast(`No fue posible inscribirte: ${err.message}`, 'error');
+      throw err;
+    }
+  };
+
+  const leaveTournament = async (tournamentId) => {
+    const csrftoken = getCookie('csrftoken');
+    try {
+      const data = await apiFetch(`/api/torneos/${tournamentId}/unenroll/`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Accept': 'application/json',
+          'X-CSRFToken': csrftoken,
+        },
+        body: JSON.stringify({}),
+      });
+      setTorneos(prev => prev.map(t => (t.id === data.tournament.id ? data.tournament : t)));
+      showToast(data.detail || 'Inscripción cancelada.', 'info');
+      return data;
+    } catch (err) {
+      showToast(`No fue posible cancelar la inscripción: ${err.message}`, 'error');
+      throw err;
+    }
+  };
+
   const registerResult = (tournamentId, matchId, scores) => {
     setTorneos(prev => prev.map(torneo => {
       if (torneo.id === tournamentId) {
@@ -99,5 +141,16 @@ export const useTorneos = () => {
     }));
   };
 
-  return { torneos, loading, error, createTorneo, deleteTorneo, updateTorneo, registerResult };
+  return {
+    torneos,
+    loading,
+    error,
+    createTorneo,
+    deleteTorneo,
+    updateTorneo,
+    enrollInTournament,
+    leaveTournament,
+    registerResult,
+    refreshTorneos: fetchTorneos,
+  };
 };

@@ -13,7 +13,7 @@ import LoginPage from "./pages/LoginPage.jsx";
 import AdminRegisterUserPage from "./pages/AdminRegisterUserPage.jsx";
 import AdminFormInscripcion from "./pages/AdminFormInscripcion.jsx";
 import AdminReport from "./pages/AdminReport.jsx";
-import NotificationsPage from "./pages/NotificationsPage.jsx";
+import NotificationsPage from './pages/NotificationsPage.jsx';
 import ProfilePage from "./pages/ProfilePage.jsx";
 import GestionCadiPage from "./pages/GestionCadiPage.jsx";
 import TorneosPage from "./pages/TorneosPage.jsx";
@@ -293,6 +293,16 @@ export default function App() {
           element={(
             <AdminRoute>
               <AdminTorneosPage />
+            </AdminRoute>
+          )}
+        />
+
+        {/* Notificaciones (solo administradores) */}
+        <Route
+          path="/notificaciones"
+          element={(
+            <AdminRoute>
+              <NotificationsPage />
             </AdminRoute>
           )}
         />

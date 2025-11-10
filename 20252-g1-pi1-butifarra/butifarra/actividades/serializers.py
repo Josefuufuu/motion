@@ -1,6 +1,16 @@
 from rest_framework import serializers
 from django.contrib.auth.models import User
-from .models import Activity, UserProfile, Tournament, ActivityEnrollment
+from .models import (
+    Activity,
+    UserProfile,
+    Tournament,
+    ActivityEnrollment,
+    TournamentEnrollment,
+    Notification,
+    NotificationDeliveryLog,
+    NotificationPreference,
+    Campaign,
+)
 
 
 class UserProfileSerializer(serializers.ModelSerializer):
@@ -43,6 +53,7 @@ class ActivitySerializer(serializers.ModelSerializer):
     # Nombre amigable del profesor (solo lectura)
     assigned_professor_name = serializers.SerializerMethodField(read_only=True)
     actual_attendees = serializers.IntegerField(read_only=True)
+    register_url = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Activity
@@ -51,8 +62,8 @@ class ActivitySerializer(serializers.ModelSerializer):
                   'instructor', 'assigned_professor', 'assigned_professor_name',
                   'visibility', 'status', 'tags', 'notes', 'actual_attendees',
                   'checkin_token', 'checkin_expires_at',
-                  'created_by', 'created_at', 'updated_at']
-        read_only_fields = ['created_by', 'created_at', 'updated_at', 'assigned_professor_name', 'actual_attendees', 'checkin_token', 'checkin_expires_at']
+                  'created_by', 'created_at', 'updated_at', 'register_url']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'assigned_professor_name', 'actual_attendees', 'checkin_token', 'checkin_expires_at', 'register_url']
 
     def get_assigned_professor_name(self, obj):
         user = getattr(obj, 'assigned_professor', None)
@@ -68,6 +79,9 @@ class ActivitySerializer(serializers.ModelSerializer):
         if not profile or profile.role != 'PROFESSOR':
             raise serializers.ValidationError('El usuario asignado no tiene rol PROFESOR')
         return value
+
+    def get_register_url(self, obj):
+        return f"/actividades/{obj.pk}"
 
     def validate(self, data):
         # Validate end time is after start time
@@ -95,8 +109,19 @@ class ActivitySerializer(serializers.ModelSerializer):
         return super().update(instance, validated_data)
 
 
+class TournamentEnrollmentSerializer(serializers.ModelSerializer):
+    user = UserSerializer(read_only=True)
+
+    class Meta:
+        model = TournamentEnrollment
+        fields = ['id', 'user', 'status', 'created_at', 'updated_at']
+        read_only_fields = fields
+
+
 class TournamentSerializer(serializers.ModelSerializer):
     created_by = UserSerializer(read_only=True)
+    enrollment = serializers.SerializerMethodField(read_only=True)
+    available_slots = serializers.SerializerMethodField(read_only=True)
 
     class Meta:
         model = Tournament
@@ -104,6 +129,64 @@ class TournamentSerializer(serializers.ModelSerializer):
             'id', 'name', 'sport', 'format', 'description', 'location',
             'inscription_start', 'inscription_end',
             'start', 'end', 'visibility', 'status', 'max_teams', 'current_teams', 'fixtures',
-            'created_by', 'created_at', 'updated_at'
+            'created_by', 'created_at', 'updated_at', 'enrollment', 'available_slots'
         ]
-        read_only_fields = ['created_by', 'created_at', 'updated_at']
+        read_only_fields = ['created_by', 'created_at', 'updated_at', 'enrollment', 'available_slots']
+
+    def get_enrollment(self, obj):
+        request = self.context.get('request') if self.context else None
+        user = getattr(request, 'user', None)
+        if not user or not user.is_authenticated:
+            return None
+        enrollment = next(
+            (enr for enr in obj.enrollments.all() if enr.user_id == user.id),
+            None,
+        )
+        if enrollment is None:
+            return None
+        return TournamentEnrollmentSerializer(enrollment, context=self.context).data
+
+    def get_available_slots(self, obj):
+        if not obj.max_teams:
+            return None
+        remaining = max(obj.max_teams - obj.current_teams, 0)
+        return remaining
+
+
+# ======================
+# Notification serializers
+# ======================
+class NotificationDeliveryLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationDeliveryLog
+        fields = ['id', 'channel', 'status', 'detail', 'created_at']
+        read_only_fields = fields
+
+
+class NotificationSerializer(serializers.ModelSerializer):
+    delivery_logs = NotificationDeliveryLogSerializer(many=True, read_only=True)
+
+    class Meta:
+        model = Notification
+        fields = [
+            'id', 'user', 'activity', 'campaign', 'title', 'body', 'channel', 'status',
+            'priority', 'scheduled_for', 'sent_at', 'read_at', 'metadata', 'created_at', 'delivery_logs'
+        ]
+        read_only_fields = ['id', 'user', 'activity', 'campaign', 'status', 'sent_at', 'read_at', 'created_at', 'delivery_logs']
+
+
+class NotificationPreferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = NotificationPreference
+        fields = ['email_enabled', 'app_enabled', 'push_enabled', 'sms_enabled', 'quiet_hours_start', 'quiet_hours_end', 'updated_at']
+        read_only_fields = ['updated_at']
+
+
+class CampaignSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Campaign
+        fields = [
+            'id', 'name', 'message', 'channel_option', 'segment', 'selected_user_ids', 'schedule_at',
+            'total_recipients', 'app_sent', 'emails_sent', 'created_by', 'created_at'
+        ]
+        read_only_fields = ['id', 'total_recipients', 'app_sent', 'emails_sent', 'created_by', 'created_at']

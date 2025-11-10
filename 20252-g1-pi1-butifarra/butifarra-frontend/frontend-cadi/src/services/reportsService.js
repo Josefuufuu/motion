@@ -77,11 +77,65 @@ function normalizeRecentActivities(rawActivities) {
   });
 }
 
+function normalizeChartDatasets(rawDatasets) {
+  if (!rawDatasets || typeof rawDatasets !== "object") {
+    return {
+      participationByType: [],
+      attendanceTrend: [],
+      capacityVsAttendance: [],
+    };
+  }
+
+  const normalizeParticipation = (rawDatasets.participation_by_type || []).map((item, index) => ({
+    category: item?.category ?? `category-${index}`,
+    label: item?.label ?? item?.category ?? "",
+    attendees: normalizeNumber(item?.attendees),
+  }));
+
+  const normalizeTrend = (rawDatasets.attendance_trend || []).map((item, index) => {
+    let dateValue = null;
+    if (item?.date instanceof Date) {
+      dateValue = item.date.toISOString();
+    } else if (typeof item?.date === "string") {
+      dateValue = item.date;
+    }
+
+    return {
+      id: index,
+      date: dateValue,
+      attendees: normalizeNumber(item?.attendees),
+    };
+  });
+
+  const normalizeCapacity = (rawDatasets.capacity_vs_attendance || []).map((item, index) => ({
+    category: item?.category ?? `category-${index}`,
+    label: item?.label ?? item?.category ?? "",
+    capacity: normalizeNumber(item?.capacity),
+    attendees: normalizeNumber(item?.attendees),
+    occupancyPercentage: normalizeNumber(item?.occupancy_percentage),
+  }));
+
+  return {
+    participationByType: normalizeParticipation,
+    attendanceTrend: normalizeTrend,
+    capacityVsAttendance: normalizeCapacity,
+  };
+}
+
 function normalizeDashboardPayload(raw) {
   return {
     summaryCards: normalizeSummaryCards(raw?.summary_cards),
     weeklyMetrics: normalizeWeeklyMetrics(raw?.weekly_metrics),
     recentActivities: normalizeRecentActivities(raw?.recent_activities),
+    chartDatasets: normalizeChartDatasets(raw?.chart_datasets),
+    datasetDocumentation:
+      typeof raw?.dataset_documentation === "object" && raw.dataset_documentation !== null
+        ? raw.dataset_documentation
+        : {},
+    filtersApplied:
+      typeof raw?.filters_applied === "object" && raw.filters_applied !== null
+        ? raw.filters_applied
+        : {},
     generatedAt:
       typeof raw?.generated_at === "string"
         ? raw.generated_at
@@ -91,8 +145,38 @@ function normalizeDashboardPayload(raw) {
   };
 }
 
-export async function fetchDashboardReports({ signal } = {}) {
-  const response = await apiFetch("/api/reports/dashboard/", {
+function buildDashboardQuery(filters = {}) {
+  const params = new URLSearchParams();
+
+  const { dateRange, activityTypes } = filters;
+
+  if (dateRange) {
+    const { start, end } = dateRange;
+    const startValue = typeof start === "string" ? start : start?.toISOString?.();
+    const endValue = typeof end === "string" ? end : end?.toISOString?.();
+
+    if (startValue && endValue) {
+      params.set("date_range", `${startValue},${endValue}`);
+    } else if (startValue) {
+      params.set("date_range", startValue);
+    } else if (endValue) {
+      params.set("date_range", `,${endValue}`);
+    }
+  }
+
+  if (Array.isArray(activityTypes) && activityTypes.length > 0) {
+    params.set("activity_type", activityTypes.join(","));
+  } else if (typeof activityTypes === "string" && activityTypes.trim()) {
+    params.set("activity_type", activityTypes.trim());
+  }
+
+  const queryString = params.toString();
+  return queryString ? `?${queryString}` : "";
+}
+
+export async function fetchDashboardReports({ signal, filters } = {}) {
+  const query = buildDashboardQuery(filters);
+  const response = await apiFetch(`/api/reports/dashboard/${query}`, {
     method: "GET",
     signal,
   });

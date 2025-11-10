@@ -22,12 +22,12 @@ ChartJS.register(
   Legend
 );
 
-export const ParticipationChart = ({ data }) => {
+export const ParticipationChart = ({ data = [] }) => {
   const chartData = {
-    labels: data.map(d => d.type),
+    labels: data.map((d) => d.label ?? d.type ?? d.category ?? ""),
     datasets: [{
       label: 'Nº de Participantes',
-      data: data.map(d => d.count),
+      data: data.map((d) => d.attendees ?? d.count ?? 0),
       backgroundColor: 'rgba(59, 130, 246, 0.6)',
       borderColor: 'rgba(59, 130, 246, 1)',
       borderWidth: 1,

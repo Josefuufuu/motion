@@ -1,10 +1,12 @@
-from django.db import models
+from django.db import models, transaction
 from django.contrib.auth.models import User
 from django.core.validators import MinValueValidator, MaxValueValidator
 from django.core.exceptions import ValidationError
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.utils import timezone
+from django.conf import settings
+from django.core.mail import EmailMessage
 
 
 class UserProfile(models.Model):
@@ -151,8 +153,30 @@ class Activity(models.Model):
         if self.capacity and not self.available_spots:
             self.available_spots = self.capacity
 
+        # Detect changes in critical fields to trigger notifications
+        changes = {}
+        if self.pk:
+            try:
+                prev = type(self).objects.get(pk=self.pk)
+                if prev.start != self.start:
+                    changes['start'] = {'old': prev.start, 'new': self.start}
+                if prev.location != self.location:
+                    changes['location'] = {'old': prev.location, 'new': self.location}
+                if prev.status != self.status:
+                    changes['status'] = {'old': prev.status, 'new': self.status}
+            except type(self).DoesNotExist:
+                changes = {}
+
         self.clean()
         super().save(*args, **kwargs)
+
+        # Enqueue notifications after saving successfully
+        if changes:
+            try:
+                enqueue_activity_change_notifications(self, changes)
+            except Exception:
+                # Avoid breaking the main flow if notifications fail
+                pass
 
     def __str__(self):
         return self.title
@@ -212,6 +236,87 @@ class Tournament(models.Model):
         return f"{self.name} ({self.sport})"
 
 
+class TournamentEnrollment(models.Model):
+    STATUS_PENDING = "pending"
+    STATUS_CONFIRMED = "confirmed"
+    STATUS_CANCELLED = "cancelled"
+
+    STATUS_CHOICES = [
+        (STATUS_PENDING, "Pendiente"),
+        (STATUS_CONFIRMED, "Confirmada"),
+        (STATUS_CANCELLED, "Cancelada"),
+    ]
+
+    ACTIVE_STATUSES = {STATUS_PENDING, STATUS_CONFIRMED}
+
+    user = models.ForeignKey(
+        User, on_delete=models.CASCADE, related_name="tournament_enrollments"
+    )
+    tournament = models.ForeignKey(
+        Tournament, on_delete=models.CASCADE, related_name="enrollments"
+    )
+    status = models.CharField(
+        max_length=16, choices=STATUS_CHOICES, default=STATUS_CONFIRMED
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    class Meta:
+        unique_together = ("user", "tournament")
+        indexes = [
+            models.Index(fields=["tournament", "status"]),
+            models.Index(fields=["user"]),
+        ]
+
+    def __str__(self):
+        return f"{self.user.username} -> {self.tournament.name} ({self.status})"
+
+    @classmethod
+    def _active_statuses(cls):
+        return cls.ACTIVE_STATUSES
+
+    @classmethod
+    def update_current_teams(cls, tournament):
+        active_count = (
+            cls.objects.filter(
+                tournament=tournament, status__in=cls._active_statuses()
+            ).count()
+        )
+        Tournament.objects.filter(pk=tournament.pk).update(
+            current_teams=active_count
+        )
+
+    @property
+    def is_active(self):
+        return self.status in self._active_statuses()
+
+    def save(self, *args, **kwargs):
+        with transaction.atomic():
+            if self.pk:
+                previous_status = (
+                    type(self)
+                    .objects.filter(pk=self.pk)
+                    .values_list("status", flat=True)
+                    .first()
+                )
+                was_active = previous_status in self._active_statuses()
+            else:
+                was_active = False
+
+            super().save(*args, **kwargs)
+
+            if was_active != self.is_active:
+                self.update_current_teams(self.tournament)
+
+    def delete(self, *args, **kwargs):
+        tournament = self.tournament
+        was_active = self.is_active
+        with transaction.atomic():
+            super().delete(*args, **kwargs)
+            if was_active:
+                self.update_current_teams(tournament)
+
+
 class ActivityEnrollment(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="activity_enrollments")
     activity = models.ForeignKey(Activity, on_delete=models.CASCADE, related_name="enrollments")
@@ -226,3 +331,263 @@ class ActivityEnrollment(models.Model):
 
     def __str__(self):
         return f"{self.user.username} -> {self.activity.title}"
+
+
+# ======================
+# Notifications module
+# ======================
+class NotificationPreference(models.Model):
+    user = models.OneToOneField(User, on_delete=models.CASCADE, related_name="notification_preferences")
+    email_enabled = models.BooleanField(default=True)
+    app_enabled = models.BooleanField(default=True)
+    push_enabled = models.BooleanField(default=False)
+    sms_enabled = models.BooleanField(default=False)
+    quiet_hours_start = models.TimeField(null=True, blank=True)
+    quiet_hours_end = models.TimeField(null=True, blank=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return f"Prefs({self.user.username})"
+
+
+@receiver(post_save, sender=User)
+def ensure_notification_prefs(sender, instance, created, **kwargs):
+    if created:
+        NotificationPreference.objects.create(user=instance)
+
+
+class Campaign(models.Model):
+    CHANNEL_OPTION_CHOICES = [
+        ("CORREO", "Correo"),
+        ("PUSH", "Push/App"),
+        ("AMBOS", "Ambos"),
+    ]
+
+    SEGMENT_CHOICES = [
+        ("Todos los usuarios", "Todos los usuarios"),
+        ("Solo Estudiantes", "Solo Estudiantes"),
+        ("Solo Profesores", "Solo Profesores"),
+        ("Seleccionados", "Seleccionados"),
+    ]
+
+    name = models.CharField(max_length=160)
+    message = models.TextField()
+    channel_option = models.CharField(max_length=16, choices=CHANNEL_OPTION_CHOICES, default="AMBOS")
+    segment = models.CharField(max_length=32, choices=SEGMENT_CHOICES, default="Todos los usuarios")
+    selected_user_ids = models.JSONField(null=True, blank=True, default=list)
+    schedule_at = models.DateTimeField(null=True, blank=True)
+
+    total_recipients = models.PositiveIntegerField(default=0)
+    app_sent = models.PositiveIntegerField(default=0)
+    emails_sent = models.PositiveIntegerField(default=0)
+
+    created_by = models.ForeignKey(User, on_delete=models.PROTECT, related_name="campaigns_created")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Campaign({self.name})"
+
+    def update_metrics(self):
+        from django.db.models import Count
+        app_count = Notification.objects.filter(campaign=self, channel='app').count()
+        email_count = Notification.objects.filter(campaign=self, channel='email', status='sent').count()
+        total = Notification.objects.filter(campaign=self).values('user').distinct().count()
+        self.app_sent = app_count
+        self.emails_sent = email_count
+        self.total_recipients = total
+        self.save(update_fields=['app_sent', 'emails_sent', 'total_recipients'])
+
+
+class Notification(models.Model):
+    CHANNEL_CHOICES = [
+        ("app", "App"),
+        ("email", "Email"),
+        ("push", "Push"),
+        ("sms", "SMS"),
+    ]
+    STATUS_CHOICES = [
+        ("pending", "Pending"),
+        ("scheduled", "Scheduled"),
+        ("sent", "Sent"),
+        ("failed", "Failed"),
+        ("read", "Read"),
+    ]
+    PRIORITY_CHOICES = [
+        ("low", "Low"),
+        ("normal", "Normal"),
+        ("high", "High"),
+    ]
+
+    user = models.ForeignKey(User, on_delete=models.CASCADE, related_name="notifications")
+    activity = models.ForeignKey(Activity, on_delete=models.SET_NULL, null=True, blank=True, related_name="notifications")
+    campaign = models.ForeignKey(Campaign, on_delete=models.SET_NULL, null=True, blank=True, related_name="notifications")
+
+    title = models.CharField(max_length=200)
+    body = models.TextField()
+    channel = models.CharField(max_length=10, choices=CHANNEL_CHOICES)  # ajustado a longitud real
+    status = models.CharField(max_length=12, choices=STATUS_CHOICES, default="pending")  # ajustado
+    priority = models.CharField(max_length=8, choices=PRIORITY_CHOICES, default="normal")  # ajustado
+
+    scheduled_for = models.DateTimeField(null=True, blank=True)
+    sent_at = models.DateTimeField(null=True, blank=True)
+    read_at = models.DateTimeField(null=True, blank=True)
+
+    metadata = models.JSONField(default=dict, blank=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)  # añadido para coincidir con la tabla
+
+    class Meta:
+        indexes = [
+            models.Index(fields=["user", "status"]),
+            models.Index(fields=["scheduled_for"]),
+            models.Index(fields=["activity", "channel"]),
+            models.Index(fields=["campaign"]),
+        ]
+
+    def mark_sent(self):
+        self.status = 'sent'
+        self.sent_at = timezone.now()
+        self.save(update_fields=['status', 'sent_at', 'updated_at'])
+
+    def mark_read(self):
+        self.status = 'read'
+        self.read_at = timezone.now()
+        self.save(update_fields=['status', 'read_at', 'updated_at'])
+
+    def __str__(self):
+        return f"Notif({self.channel}) to {self.user_id}: {self.title[:20]}"
+
+
+class NotificationDeliveryLog(models.Model):
+    notification = models.ForeignKey(Notification, on_delete=models.CASCADE, related_name='delivery_logs')
+    channel = models.CharField(max_length=16, choices=Notification.CHANNEL_CHOICES)
+    status = models.CharField(max_length=16, choices=[('success','Success'), ('error','Error')])
+    detail = models.TextField(blank=True, default="")
+    created_at = models.DateTimeField(auto_now_add=True)
+
+    def __str__(self):
+        return f"Log({self.channel},{self.status}) for {self.notification_id}"
+
+
+# Helper functions (placed at end to avoid circular imports)
+
+def _activity_change_message(activity: Activity, changes: dict):
+    fields = ", ".join(sorted(changes.keys()))
+    title = f"Actualización de actividad: {activity.title}"
+    body = f"La actividad '{activity.title}' ha sido actualizada. Campos: {fields}."
+    return title, body
+
+
+def _should_create_similar(user: User, activity: Activity, title: str, window_minutes: int = 10) -> bool:
+    since = timezone.now() - timezone.timedelta(minutes=window_minutes)
+    return not Notification.objects.filter(
+        user=user,
+        activity=activity,
+        title=title,
+        created_at__gte=since,
+    ).exists()
+
+
+def _eligible_channels(user: User):
+    # Use a safe lookup to avoid RelatedObjectDoesNotExist when prefs missing
+    try:
+        from .models import NotificationPreference  # local import avoids circular on app loading
+        prefs = NotificationPreference.objects.filter(user_id=user.id).first()
+    except Exception:
+        prefs = None
+    if not prefs:
+        # default behavior if no prefs stored yet
+        return {'app', 'email'}
+    channels = set()
+    if prefs.app_enabled:
+        channels.add('app')
+    if prefs.email_enabled:
+        channels.add('email')
+    # Extensions (push/sms) could be added here based on prefs
+    return channels
+
+
+def enqueue_activity_change_notifications(activity: Activity, changes: dict):
+    """Create Notification rows for enrolled users and assigned professor on activity changes."""
+    title, body = _activity_change_message(activity, changes)
+
+    recipients = set(
+        activity.enrollments.values_list('user_id', flat=True)
+    )
+    if activity.assigned_professor_id:
+        recipients.add(activity.assigned_professor_id)
+
+    notifs_to_create = []
+    now = timezone.now()
+
+    for user_id in recipients:
+        try:
+            user = User.objects.get(pk=user_id)
+        except User.DoesNotExist:
+            continue
+
+        if not _should_create_similar(user, activity, title):
+            continue
+
+        channels = _eligible_channels(user)
+        for ch in channels:
+            status = 'sent' if ch == 'app' else 'pending'
+            sent_at = now if ch == 'app' else None
+            notifs_to_create.append(
+                Notification(
+                    user=user,
+                    activity=activity,
+                    title=title,
+                    body=body,
+                    channel=ch,
+                    status=status,
+                    sent_at=sent_at,
+                    metadata={"type": "activity_change", "fields": list(changes.keys())},
+                )
+            )
+
+    created = []
+    if notifs_to_create:
+        created = Notification.objects.bulk_create(notifs_to_create)
+
+    # Envío inmediato de emails si aplica (best-effort)
+    try:
+        send_email_immediate = getattr(settings, 'SEND_EMAIL_IMMEDIATE', True)
+        if send_email_immediate:
+            # Seleccionar notificaciones email pendientes recién creadas
+            email_qs = Notification.objects.filter(
+                activity=activity, channel='email', status='pending', title=title,
+                created_at__gte=timezone.now() - timezone.timedelta(minutes=5)
+            )
+            for n in email_qs:
+                try:
+                    if not n.user.email:
+                        raise ValueError('Usuario sin email')
+                    if not settings.EMAIL_HOST_USER or not settings.EMAIL_HOST_PASSWORD:
+                        raise ValueError('Credenciales SMTP no configuradas')
+                    msg = EmailMessage(
+                        subject=n.title,
+                        body=n.body,
+                        from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
+                        to=[n.user.email],
+                    )
+                    msg.send(fail_silently=False)
+                    n.mark_sent()
+                    NotificationDeliveryLog.objects.create(
+                        notification=n,
+                        channel='email',
+                        status='success',
+                        detail='Email enviado por cambio de actividad'
+                    )
+                except Exception as exc:
+                    NotificationDeliveryLog.objects.create(
+                        notification=n,
+                        channel='email',
+                        status='error',
+                        detail=f'Error email: {exc}'
+                    )
+                    n.status = 'failed'
+                    n.save(update_fields=['status'])
+    except Exception:
+        # No romper en caso de error en envío
+        pass

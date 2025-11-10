@@ -13,19 +13,33 @@ from django.contrib.auth.models import User
 from django.views.decorators.csrf import ensure_csrf_cookie
 from django.middleware.csrf import get_token
 import logging
-from datetime import timedelta
+from datetime import datetime, timedelta, time
 
 from django.utils import timezone
-from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField
+from django.db.models import Avg, Count, ExpressionWrapper, F, FloatField, Sum
+from django.db.models.functions import TruncDate
+from django.utils.dateparse import parse_date, parse_datetime
 from rest_framework import viewsets, filters, permissions
+from rest_framework.authentication import SessionAuthentication
 from rest_framework.decorators import action, api_view
 from rest_framework.response import Response
 from rest_framework.reverse import reverse
 from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q
+from django.db import transaction
+from django.core.mail import send_mail, EmailMessage
+from django.conf import settings
 
-from .models import Activity, UserProfile, Tournament, ActivityEnrollment
-from .serializers import ActivitySerializer, TournamentSerializer, ActivityEnrollmentSerializer
+from .models import Activity, UserProfile, Tournament, ActivityEnrollment, TournamentEnrollment, Notification, Campaign, NotificationPreference, NotificationDeliveryLog
+from .serializers import (
+    ActivitySerializer,
+    TournamentSerializer,
+    ActivityEnrollmentSerializer,
+    TournamentEnrollmentSerializer,
+    NotificationSerializer,
+    CampaignSerializer,
+    NotificationPreferenceSerializer,
+)
 
 # Set up logging
 logger = logging.getLogger(__name__)
@@ -351,9 +365,48 @@ def api_user_activities(request):
     if not request.user.is_authenticated:
         return JsonResponse({"ok": False}, status=401)
 
-    qs = Activity.objects.all().order_by("-start")
-    data = ActivitySerializer(qs, many=True, context={"request": request}).data
-    return JsonResponse(data, safe=False, status=200)
+    activity_enrollments = (
+        ActivityEnrollment.objects.filter(user=request.user)
+        .select_related("activity")
+        .order_by("-activity__start")
+    )
+    activities = [enrollment.activity for enrollment in activity_enrollments]
+    activities_data = ActivitySerializer(
+        activities, many=True, context={"request": request}
+    ).data
+
+    tournament_enrollments = (
+        TournamentEnrollment.objects.filter(user=request.user)
+        .select_related("tournament")
+        .order_by("-tournament__start")
+    )
+
+    tournaments_data = []
+    for enrollment in tournament_enrollments:
+        tournament = enrollment.tournament
+        tournaments_data.append(
+            {
+                "id": f"tournament-{tournament.id}",
+                "title": tournament.name,
+                "description": tournament.description,
+                "location": tournament.location,
+                "start": tournament.start,
+                "end": tournament.end,
+                "category": tournament.sport or "Torneo",
+                "status": tournament.status,
+                "visibility": tournament.visibility,
+                "type": "tournament",
+                "max_teams": tournament.max_teams,
+                "current_teams": tournament.current_teams,
+            }
+        )
+
+    payload = {
+        "activities": activities_data,
+        "tournaments": tournaments_data,
+    }
+
+    return JsonResponse(payload, status=200)
 
 
 @ensure_csrf_cookie
@@ -662,15 +715,121 @@ class TournamentViewSet(viewsets.ModelViewSet):
     queryset = Tournament.objects.all().order_by('-start')
     serializer_class = TournamentSerializer
     permission_classes = [IsAdminOrReadOnly]
+    authentication_classes = [SessionAuthentication]
     filter_backends = [DjangoFilterBackend, filters.SearchFilter]
     filterset_fields = ['sport', 'status', 'visibility']
     search_fields = ['name', 'description', 'location']
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        return qs.prefetch_related('enrollments__user__profile').select_related('created_by')
 
     def perform_create(self, serializer):
         """
         Set the created_by field to the current user when creating a tournament
         """
         serializer.save(created_by=self.request.user)
+
+    @action(detail=True, methods=['post'], url_path='enroll', permission_classes=[permissions.IsAuthenticated])
+    def enroll(self, request, pk=None):
+        tournament = self.get_object()
+        today = timezone.localdate()
+
+        if tournament.status in {"finished", "cancelled"}:
+            return Response({'detail': 'El torneo no admite inscripciones en este estado.'}, status=400)
+
+        if tournament.inscription_start and today < tournament.inscription_start:
+            return Response({'detail': 'Las inscripciones aún no están abiertas.'}, status=400)
+
+        if tournament.inscription_end and today > tournament.inscription_end:
+            return Response({'detail': 'El periodo de inscripciones ha finalizado.'}, status=400)
+
+        with transaction.atomic():
+            tournament = Tournament.objects.select_for_update().get(pk=tournament.pk)
+            active_count = TournamentEnrollment.objects.filter(
+                tournament=tournament,
+                status__in=TournamentEnrollment._active_statuses(),
+            ).count()
+
+            existing_enrollment = TournamentEnrollment.objects.filter(
+                tournament=tournament, user=request.user
+            ).select_for_update().first()
+
+            if existing_enrollment and existing_enrollment.is_active:
+                return Response({'detail': 'Ya estás inscrito en este torneo.'}, status=400)
+
+            max_teams = tournament.max_teams or 0
+            if max_teams and active_count >= max_teams and not (existing_enrollment and existing_enrollment.is_active):
+                return Response({'detail': 'No hay cupos disponibles.'}, status=400)
+
+            if existing_enrollment:
+                existing_enrollment.status = TournamentEnrollment.STATUS_CONFIRMED
+                existing_enrollment.save()
+                enrollment = existing_enrollment
+                created = False
+            else:
+                enrollment = TournamentEnrollment.objects.create(
+                    tournament=tournament,
+                    user=request.user,
+                    status=TournamentEnrollment.STATUS_CONFIRMED,
+                )
+                created = True
+
+        tournament.refresh_from_db()
+        serializer = self.get_serializer(tournament)
+        enrollment_data = TournamentEnrollmentSerializer(
+            enrollment, context=self.get_serializer_context()
+        ).data
+        detail = 'Inscripción registrada correctamente.' if created else 'Inscripción reactivada.'
+        return Response(
+            {
+                'detail': detail,
+                'tournament': serializer.data,
+                'enrollment': enrollment_data,
+            },
+            status=201 if created else 200,
+        )
+
+    @action(detail=True, methods=['post'], url_path='unenroll', permission_classes=[permissions.IsAuthenticated])
+    def unenroll(self, request, pk=None):
+        tournament = self.get_object()
+
+        with transaction.atomic():
+            tournament = Tournament.objects.select_for_update().get(pk=tournament.pk)
+            try:
+                enrollment = TournamentEnrollment.objects.select_for_update().get(
+                    tournament=tournament, user=request.user
+                )
+            except TournamentEnrollment.DoesNotExist:
+                return Response({'detail': 'No tienes una inscripción registrada.'}, status=400)
+
+            if not enrollment.is_active:
+                return Response({'detail': 'La inscripción ya está cancelada.'}, status=400)
+
+            enrollment.status = TournamentEnrollment.STATUS_CANCELLED
+            enrollment.save()
+
+        tournament.refresh_from_db()
+        serializer = self.get_serializer(tournament)
+        return Response(
+            {
+                'detail': 'Inscripción cancelada correctamente.',
+                'tournament': serializer.data,
+            },
+            status=200,
+        )
+
+    @action(
+        detail=True,
+        methods=['get'],
+        url_path='enrollments',
+        permission_classes=[permissions.IsAdminUser],
+    )
+    def list_enrollments(self, request, pk=None):
+        tournament = self.get_object()
+        enrollments = tournament.enrollments.select_related('user', 'user__profile').order_by('-created_at')
+        serializer = TournamentEnrollmentSerializer(enrollments, many=True, context=self.get_serializer_context())
+        return Response(serializer.data)
 
 
 @require_GET
@@ -709,26 +868,130 @@ def api_reports_dashboard(request):
         return Response({"detail": "No autorizado"}, status=403)
 
     now = timezone.now()
+
+    category_labels = dict(Activity.CATEGORY_CHOICES)
+
+    def _parse_bound(value, is_start=True):
+        if not value:
+            return None
+
+        parsed_dt = parse_datetime(value)
+        if parsed_dt is None:
+            parsed_date = parse_date(value)
+            if parsed_date is None:
+                return None
+            parsed_dt = datetime.combine(
+                parsed_date,
+                time.min if is_start else time.max,
+            )
+
+        if timezone.is_naive(parsed_dt):
+            parsed_dt = timezone.make_aware(parsed_dt, timezone.get_current_timezone())
+        return parsed_dt
+
+    filters_applied = {}
+
+    activities_qs = Activity.objects.all()
+    enrollments_qs = ActivityEnrollment.objects.select_related("activity").all()
+    users_qs = User.objects.all()
+
+    params = getattr(request, "query_params", request.GET)
+
+    range_start = range_end = None
+    errors = {}
+
+    start_param = params.get("start_date")
+    end_param = params.get("end_date")
+
+    if start_param or end_param:
+        if start_param:
+            range_start = _parse_bound(start_param, is_start=True)
+            if range_start is None:
+                errors["start_date"] = "Formato de fecha inválido. Use YYYY-MM-DD o un datetime ISO 8601."
+        if end_param:
+            range_end = _parse_bound(end_param, is_start=False)
+            if range_end is None:
+                errors["end_date"] = "Formato de fecha inválido. Use YYYY-MM-DD o un datetime ISO 8601."
+        if range_start and range_end and range_start > range_end:
+            errors["date_range"] = "start_date no puede ser posterior a end_date."
+    else:
+        date_range = params.get("date_range")
+        if date_range:
+            parts = [part.strip() for part in date_range.split(",")]
+            if parts:
+                range_start = _parse_bound(parts[0], is_start=True)
+                if parts[0] and range_start is None:
+                    errors["date_range_start"] = "Formato de fecha inválido en date_range."
+                if len(parts) > 1:
+                    range_end = _parse_bound(parts[1], is_start=False)
+                    if parts[1] and range_end is None:
+                        errors["date_range_end"] = "Formato de fecha inválido en date_range."
+                elif parts[0]:
+                    range_end = _parse_bound(parts[0], is_start=False)
+                    if range_end is None:
+                        errors["date_range_end"] = "Formato de fecha inválido en date_range."
+                if range_start and range_end and range_start > range_end:
+                    errors["date_range"] = "El inicio del rango no puede ser posterior al final."
+
+    valid_categories = {choice[0] for choice in Activity.CATEGORY_CHOICES}
+    activity_types = []
+
+    if hasattr(params, "getlist"):
+        raw_types = params.getlist("activity_type")
+    else:
+        raw_types = [params.get("activity_type")]
+
+    raw_types = [item for item in raw_types if item]
+    if raw_types:
+        if len(raw_types) == 1 and "," in raw_types[0]:
+            activity_types = [value.strip() for value in raw_types[0].split(",") if value.strip()]
+        else:
+            for value in raw_types:
+                activity_types.extend([v.strip() for v in value.split(",") if v.strip()])
+
+        invalid_types = [value for value in activity_types if value not in valid_categories]
+        if invalid_types:
+            errors["activity_type"] = f"Tipos de actividad inválidos: {', '.join(sorted(set(invalid_types)))}"
+
+    if errors:
+        return Response({"detail": "Parámetros inválidos", "errors": errors}, status=400)
+
+    if range_start:
+        activities_qs = activities_qs.filter(start__gte=range_start)
+        enrollments_qs = enrollments_qs.filter(activity__start__gte=range_start)
+        users_qs = users_qs.filter(date_joined__gte=range_start)
+        filters_applied["start_date"] = range_start.isoformat()
+    if range_end:
+        activities_qs = activities_qs.filter(start__lte=range_end)
+        enrollments_qs = enrollments_qs.filter(activity__start__lte=range_end)
+        users_qs = users_qs.filter(date_joined__lte=range_end)
+        filters_applied["end_date"] = range_end.isoformat()
+
+    if activity_types:
+        activities_qs = activities_qs.filter(category__in=activity_types)
+        enrollments_qs = enrollments_qs.filter(activity__category__in=activity_types)
+        filters_applied["activity_types"] = activity_types
+
     start_of_day = now.replace(hour=0, minute=0, second=0, microsecond=0)
     end_of_day = start_of_day + timedelta(days=1)
 
-    todays_attendance = ActivityEnrollment.objects.filter(
+    todays_attendance = enrollments_qs.filter(
         attended=True,
         activity__start__gte=start_of_day,
         activity__start__lt=end_of_day,
     ).count()
-    yesterdays_attendance = ActivityEnrollment.objects.filter(
+    yesterdays_attendance = enrollments_qs.filter(
         attended=True,
         activity__start__gte=start_of_day - timedelta(days=1),
         activity__start__lt=start_of_day,
     ).count()
 
-    open_enrollments = Activity.objects.filter(
+    open_enrollments = activities_qs.filter(
         status="active",
         start__gte=now,
         available_spots__gt=0,
     ).count()
-    open_enrollments_previous = Activity.objects.filter(
+    open_enrollments_previous = activities_qs.filter(
         status="active",
         start__gte=now - timedelta(days=14),
         start__lt=now - timedelta(days=7),
@@ -740,58 +1003,144 @@ def api_reports_dashboard(request):
     previous_week_start = week_start - timedelta(days=7)
 
     occupancy_current = _average_occupancy(
-        Activity.objects.filter(
+        activities_qs.filter(
             start__gte=week_start,
             start__lt=week_end,
             capacity__gt=0,
         )
     )
     occupancy_previous = _average_occupancy(
-        Activity.objects.filter(
+        activities_qs.filter(
             start__gte=previous_week_start,
             start__lt=week_start,
             capacity__gt=0,
         )
     )
 
-    incidents_current = Activity.objects.filter(
+    incidents_current = activities_qs.filter(
         status="cancelled",
         updated_at__gte=now - timedelta(days=7),
     ).count()
-    incidents_previous = Activity.objects.filter(
+    incidents_previous = activities_qs.filter(
         status="cancelled",
         updated_at__gte=now - timedelta(days=14),
         updated_at__lt=now - timedelta(days=7),
     ).count()
 
-    weekly_attendance_current = ActivityEnrollment.objects.filter(
+    weekly_attendance_current = enrollments_qs.filter(
         attended=True,
         activity__start__gte=week_start,
         activity__start__lt=week_end,
     ).count()
-    weekly_attendance_previous = ActivityEnrollment.objects.filter(
+    weekly_attendance_previous = enrollments_qs.filter(
         attended=True,
         activity__start__gte=previous_week_start,
         activity__start__lt=week_start,
     ).count()
 
-    weekly_new_users_current = User.objects.filter(
+    weekly_new_users_current = users_qs.filter(
         date_joined__gte=week_start,
         date_joined__lt=week_end,
     ).count()
-    weekly_new_users_previous = User.objects.filter(
+    weekly_new_users_previous = users_qs.filter(
         date_joined__gte=previous_week_start,
         date_joined__lt=week_start,
     ).count()
 
-    weekly_activities_created_current = Activity.objects.filter(
+    weekly_activities_created_current = activities_qs.filter(
         created_at__gte=week_start,
         created_at__lt=week_end,
     ).count()
-    weekly_activities_created_previous = Activity.objects.filter(
+    weekly_activities_created_previous = activities_qs.filter(
         created_at__gte=previous_week_start,
         created_at__lt=week_start,
     ).count()
+
+    participation_by_type = [
+        {
+            "category": item["activity__category"],
+            "label": category_labels.get(item["activity__category"], item["activity__category"]),
+            "attendees": item["total"],
+        }
+        for item in enrollments_qs.filter(attended=True)
+        .values("activity__category")
+        .annotate(total=Count("id"))
+        .order_by("-total")
+    ]
+
+    attendance_series = [
+        {
+            "date": entry["day"].isoformat() if entry["day"] else None,
+            "attendees": entry["total"],
+        }
+        for entry in enrollments_qs.filter(attended=True)
+        .annotate(day=TruncDate("activity__start"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    ]
+
+    enrollment_series = [
+        {
+            "date": entry["day"].isoformat() if entry["day"] else None,
+            "enrollments": entry["total"],
+        }
+        for entry in enrollments_qs
+        .annotate(day=TruncDate("activity__start"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    ]
+
+    new_users_series = [
+        {
+            "date": entry["day"].isoformat() if entry["day"] else None,
+            "users": entry["total"],
+        }
+        for entry in users_qs
+        .annotate(day=TruncDate("date_joined"))
+        .values("day")
+        .annotate(total=Count("id"))
+        .order_by("day")
+    ]
+
+    capacity_vs_attendance = []
+    for item in (
+        activities_qs.filter(capacity__gt=0)
+        .values("category")
+        .annotate(
+            total_capacity=Sum("capacity"),
+            total_attendees=Sum("actual_attendees"),
+        )
+    ):
+        capacity = item["total_capacity"] or 0
+        attendees = item["total_attendees"] or 0
+        ratio = (attendees / capacity * 100.0) if capacity else None
+        capacity_vs_attendance.append(
+            {
+                "category": item["category"],
+                "label": category_labels.get(item["category"], item["category"]),
+                "capacity": capacity,
+                "attendees": attendees,
+                "occupancy_percentage": ratio,
+            }
+        )
+
+    chart_datasets = {
+        "participation_by_type": participation_by_type,
+        "attendance_series": attendance_series,
+        "enrollment_series": enrollment_series,
+        "new_users_series": new_users_series,
+        "capacity_vs_attendance": capacity_vs_attendance,
+    }
+
+    dataset_documentation = {
+        "participation_by_type": "Lista de categorías con asistentes (campos: category, label, attendees)",
+        "attendance_series": "Serie temporal diaria con total de asistentes (campos: date, attendees)",
+        "enrollment_series": "Serie temporal diaria con total de inscripciones (campos: date, enrollments)",
+        "new_users_series": "Serie temporal diaria de usuarios registrados (campos: date, users)",
+        "capacity_vs_attendance": "Totales de capacidad vs asistentes por categoría (campos: category, label, capacity, attendees, occupancy_percentage)",
+    }
 
     summary_cards = [
         {
@@ -852,7 +1201,7 @@ def api_reports_dashboard(request):
     ]
 
     recent_qs = (
-        Activity.objects.annotate(total_enrollments=Count("enrollments"))
+        activities_qs.annotate(total_enrollments=Count("enrollments"))
         .order_by("-start", "-created_at")
         [:5]
     )
@@ -878,7 +1227,252 @@ def api_reports_dashboard(request):
         "summary_cards": summary_cards,
         "weekly_metrics": weekly_metrics,
         "recent_activities": recent_activities,
+        "chart_datasets": chart_datasets,
+        "participation_by_type": participation_by_type,
+        "attendance_series": attendance_series,
+        "enrollment_series": enrollment_series,
+        "new_users_series": new_users_series,
+        "dataset_documentation": dataset_documentation,
+        "filters_applied": filters_applied,
         "generated_at": now.isoformat(),
     }
 
     return Response(payload, status=200)
+
+# ======================
+# Notification ViewSets
+# ======================
+class NotificationViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = NotificationSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        return Notification.objects.filter(user=self.request.user).order_by('-created_at')
+
+    @action(detail=False, methods=['post'], url_path='mark-all-read')
+    def mark_all_read(self, request):
+        qs = self.get_queryset().exclude(status='read')
+        updated = 0
+        now = timezone.now()
+        for notif in qs:
+            notif.status = 'read'
+            notif.read_at = now
+            notif.save(update_fields=['status', 'read_at'])
+            updated += 1
+        return Response({'marked': updated})
+
+    @action(detail=True, methods=['post'], url_path='read')
+    def mark_read(self, request, pk=None):
+        notif = self.get_object()
+        if notif.status != 'read':
+            notif.mark_read()
+        return Response({'ok': True, 'id': notif.id, 'status': notif.status, 'read_at': notif.read_at})
+
+    @action(detail=False, methods=['get'], url_path='campaigns')
+    def list_campaigns(self, request):
+        profile = getattr(request.user, 'profile', None)
+        if not (request.user.is_staff or request.user.is_superuser or (profile and profile.is_admin)):
+            return Response({'detail': 'No autorizado'}, status=403)
+        qs = Campaign.objects.order_by('-created_at')[:20]
+        data = CampaignSerializer(qs, many=True, context={'request': request}).data
+        return Response(data)
+
+    @action(detail=True, methods=['get'], url_path='campaign')
+    def get_campaign(self, request, pk=None):
+        profile = getattr(request.user, 'profile', None)
+        if not (request.user.is_staff or request.user.is_superuser or (profile and profile.is_admin)):
+            return Response({'detail': 'No autorizado'}, status=403)
+        try:
+            camp = Campaign.objects.get(pk=pk)
+        except Campaign.DoesNotExist:
+            return Response({'detail': 'No encontrado'}, status=404)
+        data = CampaignSerializer(camp, context={'request': request}).data
+        return Response(data)
+
+    @action(detail=False, methods=['post'], url_path='broadcast')
+    def broadcast(self, request):
+        profile = getattr(request.user, 'profile', None)
+        if not (request.user.is_staff or request.user.is_superuser or (profile and profile.is_admin)):
+            return Response({'detail': 'No autorizado'}, status=403)
+        payload = request.data
+        name = payload.get('name') or payload.get('title') or 'Campaña'
+        message = payload.get('message') or payload.get('body') or ''
+        channel_opt = payload.get('channel') or 'AMBOS'
+        segment = payload.get('segment') or 'Todos los usuarios'
+        selected_ids = payload.get('selected_user_ids') or []
+        schedule_date = payload.get('scheduleDate')
+        schedule_time = payload.get('scheduleTime')
+        schedule_at = None
+        if schedule_date and schedule_time:
+            try:
+                dt_str = f"{schedule_date} {schedule_time}"
+                schedule_at = datetime.fromisoformat(dt_str)
+                if timezone.is_naive(schedule_at):
+                    schedule_at = timezone.make_aware(schedule_at, timezone.get_current_timezone())
+            except Exception:
+                schedule_at = None
+        camp = Campaign.objects.create(
+            name=name,
+            message=message,
+            channel_option=channel_opt,
+            segment=segment,
+            selected_user_ids=selected_ids,
+            schedule_at=schedule_at,
+            created_by=request.user,
+        )
+
+        # Determine recipients
+        users_qs = User.objects.all().select_related('profile')
+        if segment == 'Solo Estudiantes':
+            users_qs = users_qs.filter(profile__role='BENEFICIARY')
+        elif segment == 'Solo Profesores':
+            users_qs = users_qs.filter(profile__role='PROFESSOR')
+        elif segment == 'Seleccionados':
+            users_qs = users_qs.filter(id__in=selected_ids)
+
+        recipients = list(users_qs)
+
+        channels = []
+        if channel_opt == 'AMBOS':
+            channels = ['email', 'app']
+        elif channel_opt == 'CORREO':
+            channels = ['email']
+        elif channel_opt == 'PUSH':
+            channels = ['app']
+
+        notifs = []
+        now = timezone.now()
+        # Read flag from settings
+        try:
+            from django.conf import settings
+            send_email_immediate = getattr(settings, 'SEND_EMAIL_IMMEDIATE', True)
+        except Exception:
+            send_email_immediate = True
+
+        for user in recipients:
+            prefs = getattr(user, 'notification_preferences', None)
+            for ch in channels:
+                # Respect preferences
+                if ch == 'app' and prefs and not prefs.app_enabled:
+                    continue
+                if ch == 'email' and prefs and not prefs.email_enabled:
+                    continue
+                # Determine initial status
+                if ch == 'app':
+                    status = 'sent'
+                    sent_at = now
+                    scheduled_for = None
+                else:
+                    # email
+                    if schedule_at and schedule_at > now:
+                        status = 'scheduled'
+                        sent_at = None
+                        scheduled_for = schedule_at
+                    else:
+                        # No programación o en el pasado: enviar ahora
+                        status = 'pending'
+                        sent_at = None
+                        scheduled_for = None
+                notifs.append(
+                    Notification(
+                        user=user,
+                        campaign=camp,
+                        title=name,
+                        body=message,
+                        channel=ch,
+                        status=status,
+                        scheduled_for=scheduled_for,
+                        sent_at=sent_at,
+                        metadata={'type': 'campaign'}
+                    )
+                )
+        if notifs:
+            Notification.objects.bulk_create(notifs)
+
+        # Envío inmediato de email si flag y no hay programación futura (o programación pasada)
+        email_queue = 0
+        try:
+            immediate_window = True if (schedule_at is None or schedule_at <= timezone.now()) else False
+        except Exception:
+            immediate_window = True
+
+        if send_email_immediate and immediate_window:
+            email_notifs = Notification.objects.filter(campaign=camp, channel='email', status='pending')
+            for n in email_notifs:
+                try:
+                    if settings.EMAIL_HOST_USER and settings.EMAIL_HOST_PASSWORD:
+                        if not n.user.email:
+                            raise ValueError('Usuario sin email')
+                        msg = EmailMessage(
+                            subject=n.title,
+                            body=n.body,
+                            from_email=settings.DEFAULT_FROM_EMAIL or settings.EMAIL_HOST_USER,
+                            to=[n.user.email],
+                        )
+                        msg.send(fail_silently=False)
+                        n.mark_sent()
+                        NotificationDeliveryLog.objects.create(
+                            notification=n,
+                            channel='email',
+                            status='success',
+                            detail='Email enviado correctamente'
+                        )
+                        email_queue += 1
+                    else:
+                        NotificationDeliveryLog.objects.create(
+                            notification=n,
+                            channel='email',
+                            status='error',
+                            detail='Credenciales de SMTP faltantes'
+                        )
+                        n.status = 'failed'
+                        n.save(update_fields=['status'])
+                except Exception as exc:
+                    NotificationDeliveryLog.objects.create(
+                        notification=n,
+                        channel='email',
+                        status='error',
+                        detail=f'Error al enviar: {exc}'
+                    )
+                    n.status = 'failed'
+                    n.save(update_fields=['status'])
+
+        camp.update_metrics()
+
+        return Response({
+            'created': len(notifs),
+            'app_sent': camp.app_sent,
+            'email_queue': email_queue,
+            'campaign_id': camp.id,
+        }, status=201)
+
+
+class CampaignViewSet(viewsets.ReadOnlyModelViewSet):
+    serializer_class = CampaignSerializer
+    queryset = Campaign.objects.all().order_by('-created_at')
+    permission_classes = [permissions.IsAuthenticated]
+
+    def list(self, request, *args, **kwargs):
+        profile = getattr(request.user, 'profile', None)
+        if not (request.user.is_staff or request.user.is_superuser or (profile and profile.is_admin)):
+            return Response({'detail': 'No autorizado'}, status=403)
+        return super().list(request, *args, **kwargs)
+
+    def retrieve(self, request, *args, **kwargs):
+        profile = getattr(request.user, 'profile', None)
+        if not (request.user.is_staff or request.user.is_superuser or (profile and profile.is_admin)):
+            return Response({'detail': 'No autorizado'}, status=403)
+        return super().retrieve(request, *args, **kwargs)
+
+
+@api_view(['GET', 'PATCH'])
+@login_required
+def api_notification_preferences(request):
+    prefs, _ = NotificationPreference.objects.get_or_create(user=request.user)
+    if request.method == 'GET':
+        return Response(NotificationPreferenceSerializer(prefs).data)
+    # PATCH
+    serializer = NotificationPreferenceSerializer(prefs, data=request.data, partial=True)
+    serializer.is_valid(raise_exception=True)
+    serializer.save()
+    return Response(serializer.data)
