@@ -11,8 +11,6 @@ DATABASES = {
     }
 }
 
-# Disable migrations for faster tests
-# This will create tables directly from models instead of running migrations
 class DisableMigrations:
     def __contains__(self, item):
         return True
@@ -20,18 +18,33 @@ class DisableMigrations:
     def __getitem__(self, item):
         return None
 
-
-# Comment this out if you want to use migrations
 # MIGRATION_MODULES = DisableMigrations()
 
-# Speed up password hashing in tests
 PASSWORD_HASHERS = [
     'django.contrib.auth.hashers.MD5PasswordHasher',
 ]
 
-# Disable debug for tests
 DEBUG = False
 
-# Email backend for tests
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
+
+# ✅ ADD THIS
+INSTALLED_APPS += [
+    "butifarra.actividades",
+]
+
+
+# --- Ensure actividades app is loaded during tests ---
+try:
+    INSTALLED_APPS  # noqa
+except NameError:
+    INSTALLED_APPS = []
+
+# Fuerza a lista por si en settings.py era tupla
+INSTALLED_APPS = list(INSTALLED_APPS)
+
+# Usa el AppConfig explícito (más seguro)
+if "butifarra.actividades.apps.ActividadesConfig" not in INSTALLED_APPS:
+    INSTALLED_APPS.append("butifarra.actividades.apps.ActividadesConfig")
+
 

@@ -35,3 +35,15 @@ DEBUG = False
 # Email backend for tests
 EMAIL_BACKEND = 'django.core.mail.backends.locmem.EmailBackend'
 
+# --- Ensure actividades app is loaded during tests ---
+try:
+    INSTALLED_APPS  # noqa
+except NameError:
+    INSTALLED_APPS = []
+
+INSTALLED_APPS = list(INSTALLED_APPS)
+
+# Lo más seguro: registrar el AppConfig explícito
+if "butifarra.actividades.apps.ActividadesConfig" not in INSTALLED_APPS:
+    INSTALLED_APPS.append("butifarra.actividades.apps.ActividadesConfig")
+
